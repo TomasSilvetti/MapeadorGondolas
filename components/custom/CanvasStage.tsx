@@ -91,7 +91,7 @@ export const CanvasStage = ({
 
   // Manejo de drag del canvas
   const handleStageMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
-    if (e.evt.button !== 1 || !e.target.hasName('empty')) return;
+    if (e.evt.button !== 1) return;
     
     setIsDraggingStage(true);
     setDragStart({
