@@ -8,6 +8,7 @@ import { CanvasStage } from '@/components/custom/CanvasStage';
 import { PropertiesPanel } from '@/components/custom/PropertiesPanel';
 import { BottomBar } from '@/components/custom/BottomBar';
 import { SidebarToggleButton } from '@/components/custom/SidebarToggleButton';
+import { SolverConfigModal } from '@/components/custom/SolverConfigModal';
 import { useCanvasControls } from '@/hooks/useCanvasControls';
 import { Gondola } from '@/types';
 
@@ -24,6 +25,9 @@ export default function MapPage() {
   // Estados de visibilidad de sidebars
   const [isComponentsPanelVisible, setIsComponentsPanelVisible] = useState(true);
   const [isPropertiesPanelVisible, setIsPropertiesPanelVisible] = useState(false);
+  
+  // Estado del modal de configuración del solver
+  const [isSolverModalOpen, setIsSolverModalOpen] = useState(false);
 
   // Historial simplificado
   const [history, setHistory] = useState<Gondola[][]>([[]]);
@@ -126,7 +130,7 @@ export default function MapPage() {
   return (
     <div className="w-screen h-screen bg-slate-900 flex flex-col overflow-hidden">
       {/* Top Bar */}
-      <TopBar />
+      <TopBar onRunSolver={() => setIsSolverModalOpen(true)} />
 
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden relative">
@@ -201,6 +205,12 @@ export default function MapPage() {
         onRedo={handleRedo}
         canUndo={historyIndex > 0}
         canRedo={historyIndex < history.length - 1}
+      />
+
+      {/* Solver Config Modal */}
+      <SolverConfigModal
+        open={isSolverModalOpen}
+        onOpenChange={setIsSolverModalOpen}
       />
     </div>
   );

@@ -26,6 +26,9 @@ export interface Shelf {
   id: string;
   numero: number;
   espacios: Space[];
+  cantidadEspacios: number; // cantidad configurable de espacios
+  restriccionModo: 'permitir' | 'excluir'; // modo de restricción
+  categoriasRestringidas: Category[]; // categorías afectadas
 }
 
 export interface Gondola {
@@ -69,6 +72,8 @@ export interface GondolasStore {
   selectedGondolaId: string | null;
   addGondola: (gondola: Gondola) => void;
   updateGondola: (id: string, data: Partial<Gondola>) => void;
+  updateShelf: (gondolaId: string, shelfId: string, data: Partial<Shelf>) => void;
+  updateShelfCount: (gondolaId: string, count: number) => void;
   deleteGondola: (id: string) => void;
   selectGondola: (id: string | null) => void;
   clearGondolas: () => void;
