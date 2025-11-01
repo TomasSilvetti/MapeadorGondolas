@@ -7,6 +7,7 @@ import { ComponentsPanel } from '@/components/custom/ComponentsPanel';
 import { CanvasStage } from '@/components/custom/CanvasStage';
 import { PropertiesPanel } from '@/components/custom/PropertiesPanel';
 import { BottomBar } from '@/components/custom/BottomBar';
+import { SidebarToggleButton } from '@/components/custom/SidebarToggleButton';
 import { useCanvasControls } from '@/hooks/useCanvasControls';
 import { Gondola } from '@/types';
 
@@ -19,6 +20,10 @@ export default function MapPage() {
 
   const canvasControls = useCanvasControls();
   const [cursorPos] = useState({ x: 0, y: 0 });
+  
+  // Estados de visibilidad de sidebars
+  const [isComponentsPanelVisible, setIsComponentsPanelVisible] = useState(true);
+  const [isPropertiesPanelVisible, setIsPropertiesPanelVisible] = useState(false);
 
   // Historial simplificado
   const [history, setHistory] = useState<Gondola[][]>([[]]);
@@ -74,6 +79,13 @@ export default function MapPage() {
   const handleSelectGondola = useCallback(
     (id: string | null) => {
       selectGondola(id);
+      // Abrir automáticamente el Properties panel cuando se selecciona un componente
+      if (id !== null) {
+        setIsPropertiesPanelVisible(true);
+      } else {
+        // Cerrar automáticamente cuando se deselecciona
+        setIsPropertiesPanelVisible(false);
+      }
     },
     [selectGondola]
   );
@@ -117,25 +129,66 @@ export default function MapPage() {
       <TopBar />
 
       {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative">
         {/* Left Panel - Components */}
-        <ComponentsPanel />
+        {isComponentsPanelVisible && <ComponentsPanel />}
+
+        {/* Left Toggle Button */}
+        {!isComponentsPanelVisible && (
+          <SidebarToggleButton
+            isVisible={isComponentsPanelVisible}
+            onToggle={() => setIsComponentsPanelVisible(true)}
+            side="left"
+          />
+        )}
 
         {/* Center - Canvas */}
-        <CanvasStage
-          gondolas={gondolas}
-          selectedGondolaId={selectedGondolaId}
-          onSelectGondola={handleSelectGondola}
-          onGondolaMove={handleGondolaMove}
-          onDrop={handleDropComponent}
-          zoom={canvasControls.zoom}
-          onZoomChange={canvasControls.setZoom}
-          stagePos={canvasControls.stagePos}
-          onStagePosChange={canvasControls.setStagePos}
-        />
+        <div className="flex-1 relative">
+          <CanvasStage
+            gondolas={gondolas}
+            selectedGondolaId={selectedGondolaId}
+            onSelectGondola={handleSelectGondola}
+            onGondolaMove={handleGondolaMove}
+            onDrop={handleDropComponent}
+            zoom={canvasControls.zoom}
+            onZoomChange={canvasControls.setZoom}
+            stagePos={canvasControls.stagePos}
+            onStagePosChange={canvasControls.setStagePos}
+            isComponentsPanelVisible={isComponentsPanelVisible}
+            isPropertiesPanelVisible={isPropertiesPanelVisible}
+          />
+          
+          {/* Toggle buttons dentro del canvas */}
+          {isComponentsPanelVisible && (
+            <SidebarToggleButton
+              isVisible={isComponentsPanelVisible}
+              onToggle={() => setIsComponentsPanelVisible(false)}
+              side="left"
+            />
+          )}
+          
+          {isPropertiesPanelVisible && (
+            <SidebarToggleButton
+              isVisible={isPropertiesPanelVisible}
+              onToggle={() => setIsPropertiesPanelVisible(false)}
+              side="right"
+            />
+          )}
+        </div>
 
         {/* Right Panel - Properties */}
-        <PropertiesPanel gondola={selectedGondola} onUpdate={handleUpdateGondola} />
+        {isPropertiesPanelVisible && (
+          <PropertiesPanel gondola={selectedGondola} onUpdate={handleUpdateGondola} />
+        )}
+
+        {/* Right Toggle Button */}
+        {!isPropertiesPanelVisible && (
+          <SidebarToggleButton
+            isVisible={isPropertiesPanelVisible}
+            onToggle={() => setIsPropertiesPanelVisible(true)}
+            side="right"
+          />
+        )}
       </div>
 
       {/* Bottom Bar */}

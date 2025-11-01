@@ -17,6 +17,8 @@ interface CanvasStageProps {
   onZoomChange: (zoom: number) => void;
   stagePos: { x: number; y: number };
   onStagePosChange: (pos: { x: number; y: number }) => void;
+  isComponentsPanelVisible: boolean;
+  isPropertiesPanelVisible: boolean;
 }
 
 const CANVAS_SIZE_FT = 100;
@@ -34,6 +36,8 @@ export const CanvasStage = ({
   onZoomChange,
   stagePos,
   onStagePosChange,
+  isComponentsPanelVisible,
+  isPropertiesPanelVisible,
 }: CanvasStageProps) => {
   const stageRef = useRef<Konva.Stage>(null);
   const [isDraggingStage, setIsDraggingStage] = useState(false);
@@ -43,7 +47,9 @@ export const CanvasStage = ({
   // Actualizar dimensiones al cambiar tamaño de ventana
   useEffect(() => {
     const updateDimensions = () => {
-      const width = window.innerWidth - 260 - 300;
+      const componentsPanelWidth = isComponentsPanelVisible ? 260 : 0;
+      const propertiesPanelWidth = isPropertiesPanelVisible ? 300 : 0;
+      const width = window.innerWidth - componentsPanelWidth - propertiesPanelWidth;
       const height = window.innerHeight - 64 - 48;
       setDimensions({ width: Math.max(width, 500), height: Math.max(height, 400) });
     };
@@ -51,7 +57,7 @@ export const CanvasStage = ({
     updateDimensions();
     window.addEventListener('resize', updateDimensions);
     return () => window.removeEventListener('resize', updateDimensions);
-  }, []);
+  }, [isComponentsPanelVisible, isPropertiesPanelVisible]);
 
   // Manejo de scroll para zoom
   useEffect(() => {
