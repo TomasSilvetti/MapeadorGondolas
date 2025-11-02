@@ -65,7 +65,7 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <p className="text-gray-600">
-                Asigna productos según margen de ganancia y popularidad
+                Asigna productos según margen de ganancia y ventas mensuales
               </p>
             </CardContent>
           </Card>

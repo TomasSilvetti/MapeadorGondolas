@@ -1,86 +1,337 @@
-import { Product, Gondola, Assignment, SolverConfig } from '@/types';
+import { Product, Gondola, Assignment, SolverConfig, SolverResult, Category } from '@/types';
+import { calculateDesiredFacings } from './facings-calculator';
+
+interface Position {
+  id: string;
+  gondolaId: string;
+  shelfId: string;
+  spaceId: string;
+  shelfNumber: number;
+  totalShelves: number;
+}
+
+interface CategoryConstraint {
+  modo: 'permitir' | 'excluir';
+  categorias: Category[];
+}
 
 /**
- * Solver algorithm for optimal product placement
- * This is a placeholder that will be expanded with actual optimization logic
- * 
- * Algorithm overview:
- * 1. Scores each product based on margin and popularity
- * 2. Scores each shelf position (optimal positions are 4-5 from bottom)
- * 3. Assigns highest-scoring products to best positions
- * 4. Respects category restrictions
- * 5. Verifies stock availability
+ * Calcula el factor de visibilidad basado en la posición del estante
+ * Estantes 4-5 son óptimos (altura de vista)
  */
+export const calculateVisibilityFactor = (
+  shelfNumber: number,
+  totalShelves: number
+): number => {
+  // Estantes óptimos (4-5 desde abajo)
+  if (shelfNumber === 4 || shelfNumber === 5) return 1.0;
+  
+  // Estantes buenos (3, 6)
+  if (shelfNumber === 3 || shelfNumber === 6) return 0.75;
+  
+  // Estantes regulares (2, 7)
+  if (shelfNumber === 2 || shelfNumber === 7) return 0.50;
+  
+  // Estantes malos (1, 8+)
+  return 0.25;
+};
 
+/**
+ * Extrae todas las posiciones disponibles de las góndolas
+ */
+const extractAllPositions = (gondolas: Gondola[]): Position[] => {
+  const positions: Position[] = [];
+  
+  for (const gondola of gondolas) {
+    if (!gondola.estantes) continue;
+    
+    const totalShelves = gondola.estantes.length;
+    
+    for (const shelf of gondola.estantes) {
+      // Generar espacios si no existen
+      const espaciosCount = shelf.cantidadEspacios || 10;
+      
+      for (let i = 0; i < espaciosCount; i++) {
+        positions.push({
+          id: `${gondola.id}-${shelf.id}-${i}`,
+          gondolaId: gondola.id,
+          shelfId: shelf.id,
+          spaceId: `space-${shelf.id}-${i}`,
+          shelfNumber: shelf.numero,
+          totalShelves,
+        });
+      }
+    }
+  }
+  
+  return positions;
+};
+
+/**
+ * Extrae las restricciones de categoría por estante
+ */
+const extractCategoryConstraints = (gondolas: Gondola[]): Record<string, CategoryConstraint> => {
+  const constraints: Record<string, CategoryConstraint> = {};
+  
+  for (const gondola of gondolas) {
+    if (!gondola.estantes) continue;
+    
+    for (const shelf of gondola.estantes) {
+      constraints[shelf.id] = {
+        modo: shelf.restriccionModo,
+        categorias: shelf.categoriasRestringidas,
+      };
+    }
+  }
+  
+  return constraints;
+};
+
+/**
+ * Calcula factores de visibilidad para todas las posiciones
+ */
+const calculateVisibilityFactors = (positions: Position[]): Record<string, number> => {
+  const factors: Record<string, number> = {};
+  
+  for (const position of positions) {
+    factors[position.id] = calculateVisibilityFactor(
+      position.shelfNumber,
+      position.totalShelves
+    );
+  }
+  
+  return factors;
+};
+
+/**
+ * Solver principal usando ILP con Web Worker
+ */
+export const solvePlacementILP = async (
+  products: Product[],
+  gondolas: Gondola[],
+  config: SolverConfig
+): Promise<SolverResult> => {
+  const startTime = Date.now();
+  
+  console.log('🚀 [Solver] Iniciando solver de optimización...');
+  console.log('📊 [Solver] Configuración:', config);
+  console.log('📦 [Solver] Productos:', products.length);
+  console.log('🏪 [Solver] Góndolas:', gondolas.length);
+  
+  try {
+    // Calcular facings deseados para productos que no los tienen
+    console.log('🧮 [Solver] Calculando facings deseados...');
+    const productsWithFacings = products.map(p => ({
+      ...p,
+      facingsDeseados: calculateDesiredFacings(p, config),
+    }));
+    
+    const totalFacings = productsWithFacings.reduce((sum, p) => sum + (p.facingsDeseados || 1), 0);
+    console.log('✅ [Solver] Facings totales deseados:', totalFacings);
+    
+    // Extraer posiciones disponibles
+    console.log('📍 [Solver] Extrayendo posiciones disponibles...');
+    const positions = extractAllPositions(gondolas);
+    console.log('✅ [Solver] Posiciones disponibles:', positions.length);
+    
+    if (positions.length === 0) {
+      console.error('❌ [Solver] No hay posiciones disponibles');
+      return {
+        assignments: [],
+        totalGanancia: 0,
+        productosNoAsignados: products.map(p => p.id),
+        tiempoEjecucion: 0,
+        status: 'error',
+        message: 'No hay posiciones disponibles en las góndolas. Asegúrate de que las góndolas tengan estantes configurados.',
+      };
+    }
+    
+    if (totalFacings > positions.length) {
+      console.warn('⚠️ [Solver] Los facings deseados exceden las posiciones disponibles');
+      console.warn(`   Facings deseados: ${totalFacings}, Posiciones: ${positions.length}`);
+    }
+    
+    // Extraer restricciones de categoría
+    console.log('🔒 [Solver] Extrayendo restricciones de categoría...');
+    const categoryConstraints = extractCategoryConstraints(gondolas);
+    const constraintsCount = Object.keys(categoryConstraints).length;
+    console.log('✅ [Solver] Restricciones de categoría:', constraintsCount);
+    
+    // 🔍 DEPURACIÓN: Mostrar muestra de restricciones
+    console.log('🔍 [Solver] Muestra de restricciones de categoría:');
+    let sampleCount = 0;
+    for (const [shelfId, constraint] of Object.entries(categoryConstraints)) {
+      if (sampleCount < 3) {
+        console.log(`   Shelf ${shelfId}:`, constraint);
+        sampleCount++;
+      }
+    }
+    
+    // 🔍 DEPURACIÓN: Mostrar categorías únicas de productos
+    const uniqueCategories = new Set(products.map(p => p.categoria));
+    console.log('🔍 [Solver] Categorías únicas en productos:', Array.from(uniqueCategories));
+    
+    // Calcular factores de visibilidad
+    console.log('👁️ [Solver] Calculando factores de visibilidad...');
+    const visibilityFactors = calculateVisibilityFactors(positions);
+    console.log('✅ [Solver] Factores de visibilidad calculados');
+    
+    // Crear Web Worker
+    console.log('⚙️ [Solver] Creando Web Worker...');
+    const worker = new Worker(
+      new URL('./solver.worker.ts', import.meta.url),
+      { type: 'module' }
+    );
+    console.log('✅ [Solver] Web Worker creado');
+    
+    // Enviar datos al worker y esperar respuesta
+    console.log('📤 [Solver] Enviando datos al worker...');
+    const result = await new Promise<SolverResult>((resolve, reject) => {
+      const timeoutMs = (config.maxExecutionTime || 30) * 1000 + 5000; // +5s de margen
+      console.log(`⏰ [Solver] Timeout configurado: ${timeoutMs / 1000}s`);
+      
+      const timeout = setTimeout(() => {
+        console.error('❌ [Solver] Timeout alcanzado');
+        worker.terminate();
+        reject(new Error(`Timeout: El solver tardó más de ${timeoutMs / 1000} segundos`));
+      }, timeoutMs);
+      
+      worker.onmessage = (e: MessageEvent) => {
+        clearTimeout(timeout);
+        worker.terminate();
+        
+        const data = e.data;
+        console.log('📥 [Solver] Respuesta recibida del worker:', {
+          success: data.success,
+          status: data.status,
+          assignments: data.assignments?.length || 0,
+        });
+        
+        if (data.success) {
+          console.log('✅ [Solver] Optimización exitosa');
+          resolve({
+            assignments: data.assignments || [],
+            totalGanancia: data.totalGanancia || 0,
+            productosNoAsignados: data.productosNoAsignados || [],
+            tiempoEjecucion: data.tiempoEjecucion || 0,
+            status: data.status || 'feasible',
+            message: data.message,
+          });
+        } else {
+          console.error('❌ [Solver] Optimización falló:', data.message || data.error);
+          resolve({
+            assignments: [],
+            totalGanancia: 0,
+            productosNoAsignados: products.map(p => p.id),
+            tiempoEjecucion: data.tiempoEjecucion || 0,
+            status: data.status || 'error',
+            message: data.message || data.error || 'Error desconocido en el solver',
+          });
+        }
+      };
+      
+      worker.onerror = (error) => {
+        console.error('❌ [Solver] Error en el worker:', error);
+        clearTimeout(timeout);
+        worker.terminate();
+        reject(error);
+      };
+      
+      // Enviar datos al worker
+      console.log('📨 [Solver] Datos enviados al worker');
+      worker.postMessage({
+        products: productsWithFacings,
+        positions,
+        visibilityFactors,
+        categoryConstraints,
+        config,
+      });
+    });
+    
+    const tiempoTotal = (Date.now() - startTime) / 1000;
+    console.log(`✅ [Solver] Proceso completado en ${tiempoTotal.toFixed(2)}s`);
+    
+    return result;
+  } catch (error: any) {
+    const tiempoEjecucion = (Date.now() - startTime) / 1000;
+    
+    console.error('❌ [Solver] Error crítico en el solver:', error);
+    console.error('📍 [Solver] Stack trace:', error.stack);
+    
+    return {
+      assignments: [],
+      totalGanancia: 0,
+      productosNoAsignados: products.map(p => p.id),
+      tiempoEjecucion,
+      status: 'error',
+      message: `Error al ejecutar el solver: ${error.message || 'Error desconocido'}. Revisa la consola del navegador para más detalles.`,
+    };
+  }
+};
+
+/**
+ * Calcula el score de un producto (usado para ordenamiento)
+ * Combina margen de ganancia y ventas del último mes
+ */
 export const calculateProductScore = (
   product: Product,
   config: SolverConfig
 ): number => {
   const marginScore = product.margen_ganancia * config.marginWeight;
-  const popularityScore = (product.popularidad / 100) * config.popularityWeight;
-  return marginScore + popularityScore;
+  // Normalizar ventas (asumiendo rango típico de 0-500 unidades)
+  const ventasNormalizadas = Math.min(product.ventas / 500, 1);
+  const salesScore = ventasNormalizadas * config.salesWeight;
+  return marginScore + salesScore;
 };
 
+/**
+ * Calcula el score de una posición
+ */
 export const calculatePositionScore = (
   shelfNumber: number,
   totalShelves: number
 ): number => {
-  // Optimal shelves are 4 and 5 (from bottom)
-  // Score decreases as we move away from those positions
-  const distanceFromOptimal = Math.min(
-    Math.abs(shelfNumber - 4),
-    Math.abs(shelfNumber - 5),
-    totalShelves - shelfNumber + 1 // distance from top
-  );
-  return Math.max(0, 1 - distanceFromOptimal * 0.2);
+  return calculateVisibilityFactor(shelfNumber, totalShelves);
 };
 
-export const solvePlacement = (
-  products: Product[],
-  gondolas: Gondola[],
-  config: SolverConfig
-): Assignment[] => {
-  const assignments: Assignment[] = [];
-  
-  // TODO: Implement greedy algorithm or optimization solver
-  // For MVP, this will be a simplified version
-  
-  return assignments;
-};
-
+/**
+ * Valida una asignación individual
+ */
 export const validateAssignment = (
   assignment: Assignment,
   product: Product,
   gondola: Gondola,
   allAssignments: Assignment[]
 ): boolean => {
-  // Verify product has stock
+  // Verificar que el producto tenga stock
   if (product.stock <= 0) return false;
   
-  // Find the space being assigned to
-  let space = null;
-  for (const shelf of gondola.estantes) {
-    space = shelf.espacios.find((s) => s.id === assignment.spaceId);
-    if (space) break;
+  // Encontrar el espacio siendo asignado
+  let shelf = null;
+  for (const s of gondola.estantes || []) {
+    if (s.id === assignment.shelfId) {
+      shelf = s;
+      break;
+    }
   }
   
-  if (!space) return false;
+  if (!shelf) return false;
   
-  // Check category restrictions
-  if (
-    space.categoriasProhibidas?.includes(product.categoria)
-  ) {
-    return false;
+  // Verificar restricciones de categoría del estante
+  if (shelf.restriccionModo === 'permitir') {
+    // Solo permitir categorías en la lista
+    if (shelf.categoriasRestringidas.length > 0 && 
+        !shelf.categoriasRestringidas.includes(product.categoria)) {
+      return false;
+    }
+  } else {
+    // Excluir categorías en la lista
+    if (shelf.categoriasRestringidas.includes(product.categoria)) {
+      return false;
+    }
   }
   
-  if (
-    space.categoriasPermitidas &&
-    !space.categoriasPermitidas.includes(product.categoria)
-  ) {
-    return false;
-  }
-  
-  // Check if space is already occupied
+  // Verificar si el espacio ya está ocupado
   const isOccupied = allAssignments.some(
     (a) =>
       a.gondolaId === assignment.gondolaId &&

@@ -11,6 +11,7 @@ interface GondolaShapeProps {
   pixelsPerFoot: number;
   onSelect: (id: string) => void;
   onDragEnd: (id: string, x: number, y: number) => void;
+  viewMode?: 'design' | 'results';
 }
 
 export const GondolaShape = ({
@@ -19,6 +20,7 @@ export const GondolaShape = ({
   pixelsPerFoot,
   onSelect,
   onDragEnd,
+  viewMode = 'design',
 }: GondolaShapeProps) => {
   const groupRef = useRef<Konva.Group>(null);
 
@@ -34,23 +36,28 @@ export const GondolaShape = ({
     }
   }, [isSelected]);
 
+  const isDraggable = viewMode === 'design';
+  const cursorStyle = viewMode === 'results' ? 'pointer' : 'grab';
+
   return (
     <Group
       ref={groupRef}
       x={gondola.x * pixelsPerFoot}
       y={gondola.y * pixelsPerFoot}
       rotation={gondola.rotation}
-      draggable
+      draggable={isDraggable}
       onClick={() => onSelect(gondola.id)}
       onDragEnd={(e) => {
-        const newX = e.target.x() / pixelsPerFoot;
-        const newY = e.target.y() / pixelsPerFoot;
-        onDragEnd(gondola.id, newX, newY);
+        if (isDraggable) {
+          const newX = e.target.x() / pixelsPerFoot;
+          const newY = e.target.y() / pixelsPerFoot;
+          onDragEnd(gondola.id, newX, newY);
+        }
       }}
       onMouseEnter={(e) => {
         const stage = e.target.getStage();
         if (stage) {
-          stage.container().style.cursor = 'grab';
+          stage.container().style.cursor = cursorStyle;
         }
       }}
       onMouseLeave={(e) => {

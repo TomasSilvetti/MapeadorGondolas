@@ -7,7 +7,7 @@ const createDefaultShelves = (count: number): Shelf[] => {
     id: `shelf-${Date.now()}-${i}`,
     numero: i + 1,
     espacios: [],
-    cantidadEspacios: 10,
+    cantidadEspacios: 1,
     restriccionModo: 'permitir' as const,
     categoriasRestringidas: [],
   }));

@@ -19,6 +19,7 @@ interface CanvasStageProps {
   onStagePosChange: (pos: { x: number; y: number }) => void;
   isComponentsPanelVisible: boolean;
   isPropertiesPanelVisible: boolean;
+  viewMode?: 'design' | 'results';
 }
 
 const CANVAS_SIZE_FT = 100;
@@ -38,6 +39,7 @@ export const CanvasStage = ({
   onStagePosChange,
   isComponentsPanelVisible,
   isPropertiesPanelVisible,
+  viewMode = 'design',
 }: CanvasStageProps) => {
   const stageRef = useRef<Konva.Stage>(null);
   const [isDraggingStage, setIsDraggingStage] = useState(false);
@@ -193,6 +195,7 @@ export const CanvasStage = ({
               pixelsPerFoot={PIXELS_PER_FOOT}
               onSelect={onSelectGondola}
               onDragEnd={onGondolaMove}
+              viewMode={viewMode}
             />
           ))}
         </Layer>

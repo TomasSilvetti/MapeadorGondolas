@@ -1,7 +1,7 @@
 import { create } from 'zustand';
-import { Assignment, AssignmentsStore } from '@/types';
+import { Assignment, AssignmentsStore, Product } from '@/types';
 
-export const useAssignmentsStore = create<AssignmentsStore>((set) => ({
+export const useAssignmentsStore = create<AssignmentsStore>((set, get) => ({
   assignments: [],
   
   assignProduct: (assignment: Assignment) =>
@@ -24,4 +24,13 @@ export const useAssignmentsStore = create<AssignmentsStore>((set) => ({
   
   clearAssignments: () =>
     set({ assignments: [] }),
+  
+  applyBulkAssignments: (newAssignments: Assignment[]) =>
+    set({ assignments: newAssignments }),
+  
+  getUnassignedProducts: (products: Product[]) => {
+    const assignments = get().assignments;
+    const assignedProductIds = new Set(assignments.map(a => a.productId));
+    return products.filter(p => !assignedProductIds.has(p.id) && p.stock > 0);
+  },
 }));

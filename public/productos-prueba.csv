@@ -1,0 +1,51 @@
+id,nombre,precio,margen_ganancia,ventas,categoria,stock
+1,Coca Cola 2L,150,0.35,380,Bebidas,100
+2,Pepsi 2L,145,0.33,320,Bebidas,80
+3,Sprite 1.5L,120,0.30,280,Bebidas,90
+4,Fanta 1.5L,120,0.30,250,Bebidas,85
+5,Agua Mineral 2L,80,0.40,450,Bebidas,150
+6,Jugo Naranja 1L,110,0.35,220,Bebidas,70
+7,Cerveza Lager 6pack,280,0.38,240,Bebidas,60
+8,Vino Tinto 750ml,450,0.42,150,Bebidas,45
+9,Leche Entera 1L,120,0.30,420,Lácteos,120
+10,Leche Descremada 1L,125,0.28,310,Lácteos,100
+11,Yogurt Natural 1kg,180,0.35,270,Lácteos,80
+12,Queso Cremoso 500g,320,0.40,230,Lácteos,60
+13,Manteca 200g,150,0.32,250,Lácteos,90
+14,Crema de Leche 200ml,95,0.30,180,Lácteos,85
+15,Pan Lactal 500g,85,0.25,410,Panadería,100
+16,Pan Integral 500g,95,0.28,280,Panadería,80
+17,Medialunas x6,120,0.35,340,Panadería,60
+18,Facturas x6,140,0.38,310,Panadería,55
+19,Galletitas Dulces 200g,110,0.32,300,Panadería,95
+20,Galletitas Saladas 200g,105,0.30,270,Panadería,90
+21,Carne Molida 500g,380,0.35,330,Carnes,70
+22,Pollo Entero kg,420,0.32,360,Carnes,65
+23,Milanesas Pollo 500g,450,0.38,290,Carnes,55
+24,Asado kg,680,0.40,220,Carnes,50
+25,Chorizo kg,520,0.36,260,Carnes,60
+26,Jamón Cocido 200g,280,0.35,320,Carnes,75
+27,Salchichas 500g,240,0.32,280,Carnes,80
+28,Tomate kg,180,0.45,370,Verduras,100
+29,Lechuga unidad,120,0.50,340,Verduras,90
+30,Cebolla kg,140,0.48,330,Verduras,95
+31,Papa kg,160,0.42,400,Verduras,110
+32,Zanahoria kg,150,0.45,300,Verduras,85
+33,Zapallo kg,130,0.40,210,Verduras,80
+34,Manzana kg,220,0.38,350,Frutas,100
+35,Banana kg,180,0.42,420,Frutas,110
+36,Naranja kg,200,0.40,330,Frutas,95
+37,Pera kg,240,0.36,270,Frutas,85
+38,Uva kg,320,0.35,190,Frutas,70
+39,Frutilla 250g,280,0.38,170,Frutas,60
+40,Arroz 1kg,180,0.30,360,Otros,120
+41,Fideos 500g,140,0.32,380,Otros,130
+42,Aceite 900ml,280,0.35,340,Otros,100
+43,Azúcar 1kg,160,0.28,350,Otros,110
+44,Sal 500g,80,0.40,290,Otros,150
+45,Harina 1kg,120,0.30,320,Otros,100
+46,Café Molido 250g,380,0.42,240,Otros,70
+47,Té Negro x25,220,0.38,200,Otros,85
+48,Mayonesa 500g,240,0.35,270,Otros,90
+49,Ketchup 500g,210,0.33,250,Otros,85
+50,Mostaza 250g,180,0.32,180,Otros,80
