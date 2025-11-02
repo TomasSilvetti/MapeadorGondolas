@@ -8,7 +8,6 @@ import { ComponentsPanel } from '@/components/custom/ComponentsPanel';
 import { CanvasStage } from '@/components/custom/CanvasStage';
 import { PropertiesPanel } from '@/components/custom/PropertiesPanel';
 import { ResultsPanel } from '@/components/custom/ResultsPanel';
-import { ShelfSelector } from '@/components/custom/ShelfSelector';
 import { BottomBar } from '@/components/custom/BottomBar';
 import { SidebarToggleButton } from '@/components/custom/SidebarToggleButton';
 import { SolverConfigModal } from '@/components/custom/SolverConfigModal';
@@ -34,14 +33,24 @@ export default function MapPage() {
   // Estado del modal de configuración del solver
   const [isSolverModalOpen, setIsSolverModalOpen] = useState(false);
   
-  // Estado del selector de estantes
-  const [isShelfSelectorOpen, setIsShelfSelectorOpen] = useState(false);
-  const [shelfSelectorGondola, setShelfSelectorGondola] = useState<Gondola | null>(null);
+  // Estado del ancho del ResultsPanel (por defecto 1/3 del viewport)
+  const [resultsPanelWidth, setResultsPanelWidth] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth / 3;
+    }
+    return 640; // fallback
+  });
   
-  // Efecto para colapsar ComponentsPanel cuando se entra en modo results
+  // Efecto para manejar la transición a modo results
   useEffect(() => {
     if (mode === 'results') {
       setIsComponentsPanelVisible(false);
+      // Asegurar que el ResultsPanel tenga el ancho correcto (1/3 de la pantalla)
+      if (typeof window !== 'undefined') {
+        setResultsPanelWidth(window.innerWidth / 3);
+      }
+    } else {
+      // Al volver a modo design, resetear el estado del properties panel
       setIsPropertiesPanelVisible(false);
     }
   }, [mode]);
@@ -102,13 +111,14 @@ export default function MapPage() {
       selectGondola(id);
       
       if (mode === 'results') {
-        // En modo results, abrir selector de estantes
+        // En modo results, abrir el ResultsPanel directamente
         if (id !== null) {
-          const gondola = gondolas.find(g => g.id === id);
-          if (gondola) {
-            setShelfSelectorGondola(gondola);
-            setIsShelfSelectorOpen(true);
-          }
+          setIsPropertiesPanelVisible(true);
+          // Limpiar selección de estante para que el usuario seleccione uno nuevo
+          setSelectedShelfId(null);
+        } else {
+          setIsPropertiesPanelVisible(false);
+          setSelectedShelfId(null);
         }
       } else {
         // En modo design, comportamiento normal
@@ -119,13 +129,12 @@ export default function MapPage() {
         }
       }
     },
-    [selectGondola, mode, gondolas]
+    [selectGondola, mode, setSelectedShelfId]
   );
   
   const handleSelectShelf = useCallback(
-    (shelfId: string) => {
+    (shelfId: string | null) => {
       setSelectedShelfId(shelfId);
-      setIsPropertiesPanelVisible(true);
     },
     [setSelectedShelfId]
   );
@@ -224,14 +233,12 @@ export default function MapPage() {
             />
           )}
           
-          {isPropertiesPanelVisible && (
+          {/* Toggle button para cerrar el panel derecho - solo en modo design */}
+          {mode === 'design' && isPropertiesPanelVisible && (
             <SidebarToggleButton
               isVisible={isPropertiesPanelVisible}
               onToggle={() => {
                 setIsPropertiesPanelVisible(false);
-                if (mode === 'results') {
-                  setSelectedShelfId(null);
-                }
               }}
               side="right"
             />
@@ -243,12 +250,19 @@ export default function MapPage() {
           <PropertiesPanel gondola={selectedGondola} onUpdate={handleUpdateGondola} />
         )}
         
-        {isPropertiesPanelVisible && mode === 'results' && (
-          <ResultsPanel gondola={selectedGondola} selectedShelfId={selectedShelfId} />
+        {/* ResultsPanel siempre visible en modo results */}
+        {mode === 'results' && (
+          <ResultsPanel 
+            gondola={selectedGondola} 
+            selectedShelfId={selectedShelfId}
+            onShelfSelect={handleSelectShelf}
+            width={resultsPanelWidth}
+            onWidthChange={setResultsPanelWidth}
+          />
         )}
 
-        {/* Right Toggle Button */}
-        {!isPropertiesPanelVisible && (
+        {/* Right Toggle Button - solo en modo design */}
+        {mode === 'design' && !isPropertiesPanelVisible && (
           <SidebarToggleButton
             isVisible={isPropertiesPanelVisible}
             onToggle={() => setIsPropertiesPanelVisible(true)}
@@ -273,14 +287,6 @@ export default function MapPage() {
       <SolverConfigModal
         open={isSolverModalOpen}
         onOpenChange={setIsSolverModalOpen}
-      />
-      
-      {/* Shelf Selector Modal */}
-      <ShelfSelector
-        open={isShelfSelectorOpen}
-        onOpenChange={setIsShelfSelectorOpen}
-        gondola={shelfSelectorGondola}
-        onSelectShelf={handleSelectShelf}
       />
     </div>
   );

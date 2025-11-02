@@ -30,6 +30,7 @@ export interface Shelf {
   cantidadEspacios: number; // cantidad configurable de espacios
   restriccionModo: 'permitir' | 'excluir'; // modo de restricción
   categoriasRestringidas: Category[]; // categorías afectadas
+  factorVisualizacion?: number; // factor de visualización basado en altura (0-1)
 }
 
 export interface Gondola {
