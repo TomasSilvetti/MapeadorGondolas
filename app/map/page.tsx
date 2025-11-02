@@ -22,7 +22,7 @@ export default function MapPage() {
   const updateGondola = useGondolasStore((state) => state.updateGondola);
   const selectGondola = useGondolasStore((state) => state.selectGondola);
 
-  const { mode, setMode, selectedShelfId, setSelectedShelfId } = useViewModeStore();
+  const { mode, setMode, selectedShelfId, setSelectedShelfId, hasResults } = useViewModeStore();
 
   const canvasControls = useCanvasControls();
   const [cursorPos] = useState({ x: 0, y: 0 });
@@ -169,6 +169,14 @@ export default function MapPage() {
       <TopBar 
         onRunSolver={() => setIsSolverModalOpen(true)}
         viewMode={mode}
+        hasResults={hasResults}
+        onToggleMode={(newMode) => {
+          setMode(newMode);
+          if (newMode === 'design') {
+            setSelectedShelfId(null);
+            setIsPropertiesPanelVisible(false);
+          }
+        }}
         onBackToDesign={() => {
           setMode('design');
           setSelectedShelfId(null);

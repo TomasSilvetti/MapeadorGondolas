@@ -2,15 +2,30 @@
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Eye } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { ArrowLeft, Eye, Edit3, BarChart3 } from 'lucide-react';
 
 interface TopBarProps {
   onRunSolver?: () => void;
   viewMode?: 'design' | 'results';
   onBackToDesign?: () => void;
+  hasResults?: boolean;
+  onToggleMode?: (mode: 'design' | 'results') => void;
 }
 
-export const TopBar = ({ onRunSolver, viewMode = 'design', onBackToDesign }: TopBarProps) => {
+export const TopBar = ({ 
+  onRunSolver, 
+  viewMode = 'design', 
+  onBackToDesign, 
+  hasResults = false,
+  onToggleMode 
+}: TopBarProps) => {
+  const handleToggleChange = (checked: boolean) => {
+    if (onToggleMode) {
+      onToggleMode(checked ? 'results' : 'design');
+    }
+  };
+
   return (
     <div className="h-16 bg-slate-950 border-b border-slate-700 flex items-center justify-between px-6">
       {/* Left side - Logo and title */}
@@ -19,51 +34,36 @@ export const TopBar = ({ onRunSolver, viewMode = 'design', onBackToDesign }: Top
           <span className="text-white font-bold text-lg">M</span>
         </div>
         <h1 className="text-lg font-semibold text-slate-100">Supermarket Layout Planner</h1>
-        
-        {/* Indicador de modo */}
-        {viewMode === 'results' && (
-          <Badge className="bg-green-900/30 text-green-300 border-green-700 flex items-center gap-1">
-            <Eye className="w-3 h-3" />
-            Modo Resultados
-          </Badge>
-        )}
       </div>
 
-      {/* Center - Menu */}
-      <div className="flex gap-6">
-        <button className="text-sm text-slate-300 hover:text-slate-100 transition-colors">
-          File
-        </button>
-        <button className="text-sm text-slate-300 hover:text-slate-100 transition-colors">
-          Edit
-        </button>
-        <button className="text-sm text-slate-300 hover:text-slate-100 transition-colors">
-          View
-        </button>
-        <button className="text-sm text-slate-300 hover:text-slate-100 transition-colors">
-          Help
-        </button>
+      {/* Center - Mode Toggle */}
+      <div className="flex items-center gap-3 bg-slate-800/50 px-4 py-2 rounded-lg border border-slate-700">
+        <div className={`flex items-center gap-2 ${viewMode === 'design' ? 'text-slate-100' : 'text-slate-400'}`}>
+          <Edit3 className="w-4 h-4" />
+          <span className="text-sm font-medium">Edición</span>
+        </div>
+        
+        <Switch
+          checked={viewMode === 'results'}
+          onCheckedChange={handleToggleChange}
+          disabled={!hasResults}
+          className="data-[state=checked]:bg-green-600"
+        />
+        
+        <div className={`flex items-center gap-2 ${viewMode === 'results' ? 'text-slate-100' : 'text-slate-400'}`}>
+          <BarChart3 className="w-4 h-4" />
+          <span className="text-sm font-medium">Resultados</span>
+        </div>
       </div>
 
       {/* Right side - Actions */}
       <div className="flex items-center gap-3">
-        {viewMode === 'results' && onBackToDesign && (
-          <Button
-            onClick={onBackToDesign}
-            variant="outline"
-            className="bg-slate-800 border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-slate-100"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Volver a Diseño
-          </Button>
-        )}
-        
         {viewMode === 'design' && (
           <Button
             onClick={onRunSolver}
             className="bg-blue-600 hover:bg-blue-700 text-white"
           >
-            Run Solver Algorithm
+            Ejecutar Optimización
           </Button>
         )}
       </div>
