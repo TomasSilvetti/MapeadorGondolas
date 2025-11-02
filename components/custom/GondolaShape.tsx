@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useEffect } from 'react';
-import { Group, Rect, Text } from 'react-konva';
+import { Group, Rect, Text, Circle, Line } from 'react-konva';
 import Konva from 'konva';
 import { Gondola } from '@/types';
 
@@ -11,6 +11,7 @@ interface GondolaShapeProps {
   pixelsPerFoot: number;
   onSelect: (id: string) => void;
   onDragEnd: (id: string, x: number, y: number) => void;
+  onDelete?: (id: string) => void;
   viewMode?: 'design' | 'results';
 }
 
@@ -20,6 +21,7 @@ export const GondolaShape = ({
   pixelsPerFoot,
   onSelect,
   onDragEnd,
+  onDelete,
   viewMode = 'design',
 }: GondolaShapeProps) => {
   const groupRef = useRef<Konva.Group>(null);
@@ -38,6 +40,19 @@ export const GondolaShape = ({
 
   const isDraggable = viewMode === 'design';
   const cursorStyle = viewMode === 'results' ? 'pointer' : 'grab';
+  const showDeleteButton = isSelected && viewMode === 'design' && onDelete;
+
+  const handleDeleteClick = (e: Konva.KonvaEventObject<MouseEvent>) => {
+    e.cancelBubble = true; // Prevenir que se propague al grupo
+    if (onDelete) {
+      onDelete(gondola.id);
+    }
+  };
+
+  // Tamaño y posición del botón de eliminar
+  const deleteButtonSize = 24;
+  const deleteButtonX = width - deleteButtonSize / 2;
+  const deleteButtonY = -deleteButtonSize / 2;
 
   return (
     <Group
@@ -86,6 +101,49 @@ export const GondolaShape = ({
         fill="#f1f5f9"
         pointerEvents="none"
       />
+      
+      {/* Botón de eliminar */}
+      {showDeleteButton && (
+        <Group
+          x={deleteButtonX}
+          y={deleteButtonY}
+          onClick={handleDeleteClick}
+          onMouseEnter={(e) => {
+            const stage = e.target.getStage();
+            if (stage) {
+              stage.container().style.cursor = 'pointer';
+            }
+          }}
+          onMouseLeave={(e) => {
+            const stage = e.target.getStage();
+            if (stage) {
+              stage.container().style.cursor = cursorStyle;
+            }
+          }}
+        >
+          {/* Círculo de fondo */}
+          <Circle
+            radius={deleteButtonSize / 2}
+            fill="#ef4444"
+            stroke="#dc2626"
+            strokeWidth={2}
+          />
+          
+          {/* Cruz (X) */}
+          <Line
+            points={[-6, -6, 6, 6]}
+            stroke="#ffffff"
+            strokeWidth={2}
+            lineCap="round"
+          />
+          <Line
+            points={[6, -6, -6, 6]}
+            stroke="#ffffff"
+            strokeWidth={2}
+            lineCap="round"
+          />
+        </Group>
+      )}
     </Group>
   );
 };

@@ -12,6 +12,7 @@ interface CanvasStageProps {
   selectedGondolaId: string | null;
   onSelectGondola: (id: string | null) => void;
   onGondolaMove: (id: string, x: number, y: number) => void;
+  onGondolaDelete: (id: string) => void;
   onDrop: (x: number, y: number, componentData: Record<string, unknown>) => void;
   zoom: number;
   onZoomChange: (zoom: number) => void;
@@ -32,6 +33,7 @@ export const CanvasStage = ({
   selectedGondolaId,
   onSelectGondola,
   onGondolaMove,
+  onGondolaDelete,
   onDrop,
   zoom,
   onZoomChange,
@@ -195,6 +197,7 @@ export const CanvasStage = ({
               pixelsPerFoot={PIXELS_PER_FOOT}
               onSelect={onSelectGondola}
               onDragEnd={onGondolaMove}
+              onDelete={onGondolaDelete}
               viewMode={viewMode}
             />
           ))}

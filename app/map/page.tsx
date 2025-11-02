@@ -19,6 +19,7 @@ export default function MapPage() {
   const selectedGondolaId = useGondolasStore((state) => state.selectedGondolaId);
   const addGondola = useGondolasStore((state) => state.addGondola);
   const updateGondola = useGondolasStore((state) => state.updateGondola);
+  const deleteGondola = useGondolasStore((state) => state.deleteGondola);
   const selectGondola = useGondolasStore((state) => state.selectGondola);
 
   const { mode, setMode, selectedShelfId, setSelectedShelfId, hasResults } = useViewModeStore();
@@ -148,6 +149,16 @@ export default function MapPage() {
     [gondolas, updateGondola, addToHistory]
   );
 
+  const handleDeleteGondola = useCallback(
+    (id: string) => {
+      deleteGondola(id);
+      const filteredGondolas = gondolas.filter((g) => g.id !== id);
+      addToHistory(filteredGondolas);
+      setIsPropertiesPanelVisible(false);
+    },
+    [gondolas, deleteGondola, addToHistory]
+  );
+
   const handleUndo = useCallback(() => {
     if (historyIndex > 0) {
       const newIndex = historyIndex - 1;
@@ -214,6 +225,7 @@ export default function MapPage() {
             selectedGondolaId={selectedGondolaId}
             onSelectGondola={handleSelectGondola}
             onGondolaMove={handleGondolaMove}
+            onGondolaDelete={handleDeleteGondola}
             onDrop={handleDropComponent}
             zoom={canvasControls.zoom}
             onZoomChange={canvasControls.setZoom}
