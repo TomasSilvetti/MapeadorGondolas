@@ -7,7 +7,7 @@ import { TopBar } from '@/components/custom/TopBar';
 import { ComponentsPanel } from '@/components/custom/ComponentsPanel';
 import { CanvasStage } from '@/components/custom/CanvasStage';
 import { PropertiesPanel } from '@/components/custom/PropertiesPanel';
-import { ResultsPanel } from '@/components/custom/ResultsPanel';
+import { ShelfDetailsModal } from '@/components/custom/ShelfDetailsModal';
 import { BottomBar } from '@/components/custom/BottomBar';
 import { SidebarToggleButton } from '@/components/custom/SidebarToggleButton';
 import { SolverConfigModal } from '@/components/custom/SolverConfigModal';
@@ -34,25 +34,18 @@ export default function MapPage() {
   // Estado del modal de configuración del solver
   const [isSolverModalOpen, setIsSolverModalOpen] = useState(false);
   
-  // Estado del ancho del ResultsPanel (por defecto 1/3 del viewport)
-  const [resultsPanelWidth, setResultsPanelWidth] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return window.innerWidth / 3;
-    }
-    return 640; // fallback
-  });
+  // Estado del modal de detalles de estante
+  const [isShelfModalOpen, setIsShelfModalOpen] = useState(false);
   
   // Efecto para manejar la transición a modo results
   useEffect(() => {
     if (mode === 'results') {
       setIsComponentsPanelVisible(false);
-      // Asegurar que el ResultsPanel tenga el ancho correcto (1/3 de la pantalla)
-      if (typeof window !== 'undefined') {
-        setResultsPanelWidth(window.innerWidth / 3);
-      }
-    } else {
-      // Al volver a modo design, resetear el estado del properties panel
       setIsPropertiesPanelVisible(false);
+    } else {
+      // Al volver a modo design, resetear el estado
+      setIsPropertiesPanelVisible(false);
+      setIsShelfModalOpen(false);
     }
   }, [mode]);
 
@@ -112,13 +105,13 @@ export default function MapPage() {
       selectGondola(id);
       
       if (mode === 'results') {
-        // En modo results, abrir el ResultsPanel directamente
+        // En modo results, abrir el modal si hay una góndola seleccionada
         if (id !== null) {
-          setIsPropertiesPanelVisible(true);
+          setIsShelfModalOpen(true);
           // Limpiar selección de estante para que el usuario seleccione uno nuevo
           setSelectedShelfId(null);
         } else {
-          setIsPropertiesPanelVisible(false);
+          setIsShelfModalOpen(false);
           setSelectedShelfId(null);
         }
       } else {
@@ -257,20 +250,9 @@ export default function MapPage() {
           )}
         </div>
 
-        {/* Right Panel - Properties o Results según el modo */}
+        {/* Right Panel - Properties solo en modo design */}
         {isPropertiesPanelVisible && mode === 'design' && (
           <PropertiesPanel gondola={selectedGondola} onUpdate={handleUpdateGondola} />
-        )}
-        
-        {/* ResultsPanel siempre visible en modo results */}
-        {mode === 'results' && (
-          <ResultsPanel 
-            gondola={selectedGondola} 
-            selectedShelfId={selectedShelfId}
-            onShelfSelect={handleSelectShelf}
-            width={resultsPanelWidth}
-            onWidthChange={setResultsPanelWidth}
-          />
         )}
 
         {/* Right Toggle Button - solo en modo design */}
@@ -300,6 +282,17 @@ export default function MapPage() {
         open={isSolverModalOpen}
         onOpenChange={setIsSolverModalOpen}
       />
+
+      {/* Shelf Details Modal - solo en modo results */}
+      {mode === 'results' && (
+        <ShelfDetailsModal
+          open={isShelfModalOpen}
+          onOpenChange={setIsShelfModalOpen}
+          gondola={selectedGondola}
+          selectedShelfId={selectedShelfId}
+          onShelfSelect={handleSelectShelf}
+        />
+      )}
     </div>
   );
 }

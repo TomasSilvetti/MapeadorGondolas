@@ -105,9 +105,9 @@ export const ShelfVisualization = ({
 
               {/* Barra visual del estante con productos */}
               <div className="flex items-center gap-2">
-                <div className="flex-1 bg-slate-800 rounded h-8 p-1">
+                <div className="flex-1 bg-slate-800 rounded h-12 p-1">
                   {/* Divisiones de espacios con separación */}
-                  <div className="flex gap-1 h-full">
+                  <div className="flex gap-1.5 h-full">
                     {Array.from({ length: shelf.cantidadEspacios }).map((_, i) => {
                       const spaceData = occupiedSpaces.get(i);
                       
