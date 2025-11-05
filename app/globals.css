@@ -119,4 +119,34 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Estilos personalizados para scrollbar - tema oscuro */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(71, 85, 105) rgb(30, 41, 59);
+  }
+  
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  
+  *::-webkit-scrollbar-track {
+    background: rgb(30, 41, 59);
+    border-radius: 4px;
+  }
+  
+  *::-webkit-scrollbar-thumb {
+    background: rgb(71, 85, 105);
+    border-radius: 4px;
+    border: 2px solid rgb(30, 41, 59);
+  }
+  
+  *::-webkit-scrollbar-thumb:hover {
+    background: rgb(100, 116, 139);
+  }
+  
+  *::-webkit-scrollbar-corner {
+    background: rgb(30, 41, 59);
+  }
 }

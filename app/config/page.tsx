@@ -39,7 +39,7 @@ export default function ConfigPage() {
           <CardHeader>
             <CardTitle>Pesos de Optimización</CardTitle>
             <CardDescription>
-              Controla cómo el algoritmo pondera el margen de ganancia vs popularidad
+              Controla cómo el algoritmo pondera el margen de ganancia vs ventas
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -81,7 +81,7 @@ export default function ConfigPage() {
                 <span className="text-sm font-semibold text-gray-900 w-12">0.4</span>
               </div>
               <p className="text-xs text-gray-500 mt-1">
-                Mayor valor = más importancia a la popularidad
+                Mayor valor = más importancia a las ventas
               </p>
             </div>
 
