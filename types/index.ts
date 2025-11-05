@@ -142,4 +142,7 @@ export interface ProjectsStore {
   setActiveProject: (id: string | null) => void;
   getActiveProject: () => Project | null;
   syncActiveProject: () => void;
+  exportProject: (id: string) => void;
+  importProject: (project: Project, replaceIfExists: boolean) => void;
+  checkProjectExists: (id: string) => boolean;
 }

@@ -46,6 +46,7 @@ export default function MapPage() {
   const getActiveProject = useProjectsStore((state) => state.getActiveProject);
   const updateProject = useProjectsStore((state) => state.updateProject);
   const loadProjects = useProjectsStore((state) => state.loadProjects);
+  const exportProject = useProjectsStore((state) => state.exportProject);
 
   const { mode, setMode, selectedShelfId, setSelectedShelfId, hasResults } = useViewModeStore();
 
@@ -263,6 +264,13 @@ export default function MapPage() {
   // Obtener góndola seleccionada
   const selectedGondola = gondolas.find((g) => g.id === selectedGondolaId) || null;
 
+  // Manejar exportación del proyecto
+  const handleExport = useCallback(() => {
+    if (activeProjectId) {
+      exportProject(activeProjectId);
+    }
+  }, [activeProjectId, exportProject]);
+
   return (
     <div className="w-screen h-screen bg-slate-900 flex flex-col overflow-hidden">
       {/* Top Bar */}
@@ -282,6 +290,7 @@ export default function MapPage() {
           setSelectedShelfId(null);
           setIsPropertiesPanelVisible(false);
         }}
+        onExport={handleExport}
       />
 
       {/* Main Content */}

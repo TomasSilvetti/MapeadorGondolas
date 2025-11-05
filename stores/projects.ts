@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { Project, ProjectsStore, Gondola, Product, Assignment, SolverConfig } from '@/types';
+import { exportProjectToFile, cloneProjectWithNewId } from '@/utils/project-io';
 
 const STORAGE_KEY = 'mapeador-gondolas-projects';
 const ACTIVE_PROJECT_KEY = 'mapeador-gondolas-active-project';
@@ -149,5 +150,58 @@ export const useProjectsStore = create<ProjectsStore>((set, get) => ({
     // Esta función se llamará desde el mapeador para sincronizar cambios
     // Por ahora es un placeholder - la sincronización real se hará desde map/page.tsx
   },
+
+  exportProject: (id: string) => {
+    const state = get();
+    const project = state.projects.find((p) => p.id === id);
+    if (!project) {
+      console.error('Proyecto no encontrado para exportar');
+      return;
+    }
+    exportProjectToFile(project);
+  },
+
+  importProject: (project: Project, replaceIfExists: boolean) => {
+    set((state) => {
+      const existingIndex = state.projects.findIndex((p) => p.id === project.id);
+      let newProjects: Project[];
+      let projectToSet: Project;
+
+      if (existingIndex !== -1 && replaceIfExists) {
+        // Reemplazar proyecto existente
+        newProjects = [...state.projects];
+        newProjects[existingIndex] = {
+          ...project,
+          fechaModificacion: new Date().toISOString(),
+        };
+        projectToSet = newProjects[existingIndex];
+      } else {
+        // Crear nuevo proyecto (con nuevo ID si ya existe)
+        if (existingIndex !== -1) {
+          projectToSet = cloneProjectWithNewId(project);
+        } else {
+          projectToSet = {
+            ...project,
+            fechaModificacion: new Date().toISOString(),
+          };
+        }
+        newProjects = [...state.projects, projectToSet];
+      }
+
+      saveToStorage(newProjects);
+      saveActiveProjectId(projectToSet.id);
+
+      return {
+        projects: newProjects,
+        activeProjectId: projectToSet.id,
+      };
+    });
+  },
+
+  checkProjectExists: (id: string): boolean => {
+    const state = get();
+    return state.projects.some((p) => p.id === id);
+  },
 }));
+
 
