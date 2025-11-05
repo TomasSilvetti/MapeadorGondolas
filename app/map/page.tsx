@@ -1,7 +1,12 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useGondolasStore } from '@/stores/gondolas';
+import { useProductsStore } from '@/stores/products';
+import { useAssignmentsStore } from '@/stores/assignments';
+import { useSolverConfigStore } from '@/stores/solver-config';
+import { useProjectsStore } from '@/stores/projects';
 import { useViewModeStore } from '@/stores/view-mode';
 import { TopBar } from '@/components/custom/TopBar';
 import { ComponentsPanel } from '@/components/custom/ComponentsPanel';
@@ -15,14 +20,96 @@ import { useCanvasControls } from '@/hooks/useCanvasControls';
 import { Gondola } from '@/types';
 
 export default function MapPage() {
+  const router = useRouter();
+  
+  // Stores
   const gondolas = useGondolasStore((state) => state.gondolas);
   const selectedGondolaId = useGondolasStore((state) => state.selectedGondolaId);
   const addGondola = useGondolasStore((state) => state.addGondola);
   const updateGondola = useGondolasStore((state) => state.updateGondola);
   const deleteGondola = useGondolasStore((state) => state.deleteGondola);
   const selectGondola = useGondolasStore((state) => state.selectGondola);
+  const clearGondolas = useGondolasStore((state) => state.clearGondolas);
+
+  const products = useProductsStore((state) => state.products);
+  const loadProducts = useProductsStore((state) => state.loadProducts);
+  const clearProducts = useProductsStore((state) => state.clearProducts);
+  
+  const assignments = useAssignmentsStore((state) => state.assignments);
+  const applyBulkAssignments = useAssignmentsStore((state) => state.applyBulkAssignments);
+  const clearAssignments = useAssignmentsStore((state) => state.clearAssignments);
+  
+  const solverConfig = useSolverConfigStore((state) => state.config);
+  const updateSolverConfig = useSolverConfigStore((state) => state.updateConfig);
+  
+  const activeProjectId = useProjectsStore((state) => state.activeProjectId);
+  const getActiveProject = useProjectsStore((state) => state.getActiveProject);
+  const updateProject = useProjectsStore((state) => state.updateProject);
+  const loadProjects = useProjectsStore((state) => state.loadProjects);
 
   const { mode, setMode, selectedShelfId, setSelectedShelfId, hasResults } = useViewModeStore();
+
+  // Estado para controlar si ya se cargó el proyecto
+  const [projectLoaded, setProjectLoaded] = useState(false);
+
+  // Cargar proyecto activo al montar
+  useEffect(() => {
+    if (projectLoaded) return;
+
+    // Limpiar stores antes de cargar
+    clearGondolas();
+    clearProducts();
+    clearAssignments();
+
+    loadProjects();
+    const activeProject = getActiveProject();
+    
+    if (!activeProject) {
+      // Si no hay proyecto activo, redirigir a la página principal
+      router.push('/');
+      return;
+    }
+
+    // Cargar datos del proyecto en los stores solo si hay datos
+    if (activeProject.gondolas.length > 0) {
+      // Cargar góndolas
+      activeProject.gondolas.forEach((gondola) => {
+        addGondola(gondola);
+      });
+    }
+    
+    if (activeProject.products.length > 0) {
+      loadProducts(activeProject.products);
+    }
+    
+    if (activeProject.assignments.length > 0) {
+      applyBulkAssignments(activeProject.assignments);
+    }
+    
+    if (activeProject.solverConfig) {
+      updateSolverConfig(activeProject.solverConfig);
+    }
+
+    setProjectLoaded(true);
+  }, [projectLoaded, clearGondolas, clearProducts, clearAssignments, loadProjects, getActiveProject, router, addGondola, loadProducts, applyBulkAssignments, updateSolverConfig]);
+
+  // Sincronizar cambios con el proyecto activo
+  useEffect(() => {
+    if (!activeProjectId) return;
+
+    const syncTimeout = setTimeout(() => {
+      updateProject(activeProjectId, {
+        gondolas,
+        products,
+        assignments,
+        solverConfig,
+        cantidadGondolas: gondolas.length,
+        cantidadProductos: products.length,
+      });
+    }, 1000); // Debounce de 1 segundo
+
+    return () => clearTimeout(syncTimeout);
+  }, [gondolas, products, assignments, solverConfig, activeProjectId, updateProject]);
 
   const canvasControls = useCanvasControls();
   const [cursorPos] = useState({ x: 0, y: 0 });

@@ -1,9 +1,10 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { ArrowLeft, Eye, Edit3, BarChart3 } from 'lucide-react';
+import { ArrowLeft, Eye, Edit3, BarChart3, Home } from 'lucide-react';
 
 interface TopBarProps {
   onRunSolver?: () => void;
@@ -20,6 +21,8 @@ export const TopBar = ({
   hasResults = false,
   onToggleMode 
 }: TopBarProps) => {
+  const router = useRouter();
+  
   const handleToggleChange = (checked: boolean) => {
     if (onToggleMode) {
       onToggleMode(checked ? 'results' : 'design');
@@ -30,6 +33,16 @@ export const TopBar = ({
     <div className="h-16 bg-slate-950 border-b border-slate-700 flex items-center justify-between px-6">
       {/* Left side - Logo and title */}
       <div className="flex items-center gap-3">
+        <Button
+          onClick={() => router.push('/')}
+          variant="ghost"
+          size="sm"
+          className="text-slate-400 hover:text-slate-100 hover:bg-slate-800"
+        >
+          <Home className="w-4 h-4 mr-2" />
+          Inicio
+        </Button>
+        <div className="w-px h-6 bg-slate-700" />
         <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
           <span className="text-white font-bold text-lg">M</span>
         </div>

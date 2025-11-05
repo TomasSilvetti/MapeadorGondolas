@@ -117,3 +117,29 @@ export interface ViewModeStore {
   selectedShelfId: string | null;
   setSelectedShelfId: (id: string | null) => void;
 }
+
+// Project types
+export interface Project {
+  id: string;
+  nombre: string;
+  fechaCreacion: string;
+  fechaModificacion: string;
+  cantidadGondolas: number;
+  cantidadProductos: number;
+  gondolas: Gondola[];
+  products: Product[];
+  assignments: Assignment[];
+  solverConfig: SolverConfig;
+}
+
+export interface ProjectsStore {
+  projects: Project[];
+  activeProjectId: string | null;
+  loadProjects: () => void;
+  createProject: (nombre: string) => Project;
+  updateProject: (id: string, data: Partial<Project>) => void;
+  deleteProject: (id: string) => void;
+  setActiveProject: (id: string | null) => void;
+  getActiveProject: () => Project | null;
+  syncActiveProject: () => void;
+}

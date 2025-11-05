@@ -1,116 +1,90 @@
-import Link from 'next/link';
+'use client';
+
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useProjectsStore } from '@/stores/projects';
+import { ProjectCard } from '@/components/custom/ProjectCard';
+import { CreateProjectModal } from '@/components/custom/CreateProjectModal';
+import { Plus, FolderOpen } from 'lucide-react';
 
 export default function Home() {
+  const projects = useProjectsStore((state) => state.projects);
+  const loadProjects = useProjectsStore((state) => state.loadProjects);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  useEffect(() => {
+    loadProjects();
+  }, [loadProjects]);
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+    <div className="min-h-screen bg-slate-900">
       {/* Navigation */}
-      <nav className="border-b bg-white shadow-sm">
+      <nav className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-gray-900">Mapeador de Góndolas</h1>
+            <h1 className="text-2xl font-bold text-slate-100">Mapeador de Góndolas</h1>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Optimiza la Disposición de Productos en tu Supermercado
+      {/* Main Content */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Header */}
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold text-slate-100 mb-2">
+            Mis Proyectos
           </h2>
-          <p className="text-xl text-gray-600 mb-8">
-            Utiliza nuestro sistema de mapeo visual para diseñar layouts óptimos y maximizar rentabilidad
+          <p className="text-slate-400">
+            Gestiona y organiza tus layouts de góndolas
           </p>
-          <div className="flex gap-4 justify-center">
-            <Link href="/map">
-              <Button size="lg" className="px-8">
-                Comenzar Mapeador
-              </Button>
-            </Link>
+        </div>
+
+        {/* Projects Grid */}
+        {projects.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="bg-slate-800 rounded-full p-6 mb-6">
+              <FolderOpen className="w-16 h-16 text-slate-600" />
+            </div>
+            <h3 className="text-xl font-semibold text-slate-300 mb-2">
+              No hay proyectos aún
+            </h3>
+            <p className="text-slate-500 mb-6 text-center max-w-md">
+              Crea tu primer proyecto para comenzar a diseñar layouts de góndolas y optimizar la disposición de productos
+            </p>
+            <Button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="bg-blue-600 hover:bg-blue-700"
+              size="lg"
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              Crear Primer Proyecto
+            </Button>
           </div>
-        </div>
-
-        {/* Features Grid */}
-        <div className="grid md:grid-cols-3 gap-6 mt-16">
-          <Card>
-            <CardHeader>
-              <CardTitle>Diseño Visual</CardTitle>
-              <CardDescription>Crea layouts interactivos</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">
-                Posiciona góndolas en una vista superior con drag and drop intuitivo
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Configuración de Góndolas</CardTitle>
-              <CardDescription>Personaliza cada góndola</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">
-                Configura estantes, espacios y restricciones de categorías
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Algoritmo Solver</CardTitle>
-              <CardDescription>Optimiza automáticamente</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">
-                Asigna productos según margen de ganancia y ventas mensuales
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Workflow Section */}
-        <div className="mt-16 bg-white rounded-lg shadow-md p-8">
-          <h3 className="text-2xl font-bold text-gray-900 mb-8">Flujo de Trabajo</h3>
-          <div className="grid md:grid-cols-4 gap-4 text-center">
-            <div>
-              <div className="bg-blue-100 text-blue-700 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3 font-bold">
-                1
-              </div>
-              <p className="text-gray-700 font-medium">Cargar Productos</p>
-            </div>
-            <div className="flex items-center justify-center">
-              <div className="text-2xl text-gray-400">→</div>
-            </div>
-            <div>
-              <div className="bg-blue-100 text-blue-700 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3 font-bold">
-                2
-              </div>
-              <p className="text-gray-700 font-medium">Diseñar Layout</p>
-            </div>
-            <div className="flex items-center justify-center">
-              <div className="text-2xl text-gray-400">→</div>
-            </div>
-            <div>
-              <div className="bg-blue-100 text-blue-700 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3 font-bold">
-                3
-              </div>
-              <p className="text-gray-700 font-medium">Ejecutar Solver</p>
-            </div>
-            <div className="flex items-center justify-center">
-              <div className="text-2xl text-gray-400">→</div>
-            </div>
-            <div>
-              <div className="bg-blue-100 text-blue-700 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3 font-bold">
-                4
-              </div>
-              <p className="text-gray-700 font-medium">Ver Reportes</p>
-            </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {projects.map((project) => (
+              <ProjectCard key={project.id} project={project} />
+            ))}
           </div>
-        </div>
+        )}
       </section>
+
+      {/* Floating Action Button */}
+      {projects.length > 0 && (
+        <button
+          onClick={() => setIsCreateModalOpen(true)}
+          className="fixed bottom-8 right-8 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110"
+          aria-label="Crear nuevo proyecto"
+        >
+          <Plus className="w-6 h-6" />
+        </button>
+      )}
+
+      {/* Create Project Modal */}
+      <CreateProjectModal
+        open={isCreateModalOpen}
+        onOpenChange={setIsCreateModalOpen}
+      />
     </div>
   );
 }
