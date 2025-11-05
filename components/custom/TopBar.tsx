@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { ArrowLeft, Eye, Edit3, BarChart3, Home } from 'lucide-react';
+import { ArrowLeft, Eye, Edit3, BarChart3, Home, Download } from 'lucide-react';
 
 interface TopBarProps {
   onRunSolver?: () => void;
@@ -12,6 +12,7 @@ interface TopBarProps {
   onBackToDesign?: () => void;
   hasResults?: boolean;
   onToggleMode?: (mode: 'design' | 'results') => void;
+  onExport?: () => void;
 }
 
 export const TopBar = ({ 
@@ -19,7 +20,8 @@ export const TopBar = ({
   viewMode = 'design', 
   onBackToDesign, 
   hasResults = false,
-  onToggleMode 
+  onToggleMode,
+  onExport
 }: TopBarProps) => {
   const router = useRouter();
   
@@ -71,6 +73,16 @@ export const TopBar = ({
 
       {/* Right side - Actions */}
       <div className="flex items-center gap-3">
+        {onExport && (
+          <Button
+            onClick={onExport}
+            variant="outline"
+            className="border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-slate-100"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Exportar
+          </Button>
+        )}
         {viewMode === 'design' && (
           <Button
             onClick={onRunSolver}
