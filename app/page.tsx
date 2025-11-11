@@ -6,6 +6,7 @@ import { useProjectsStore } from '@/stores/projects';
 import { ProjectCard } from '@/components/custom/ProjectCard';
 import { CreateProjectModal } from '@/components/custom/CreateProjectModal';
 import { ImportDialog } from '@/components/custom/ImportDialog';
+import { WelcomeGuide } from '@/components/custom/WelcomeGuide';
 import { Plus, FolderOpen, Upload, FileUp } from 'lucide-react';
 import { readProjectFile } from '@/utils/project-io';
 import { Project } from '@/types';
@@ -140,6 +141,9 @@ export default function Home() {
             </Button>
           </div>
         </div>
+
+        {/* Welcome Guide */}
+        <WelcomeGuide />
 
         {/* Error de importación */}
         {importError && (
