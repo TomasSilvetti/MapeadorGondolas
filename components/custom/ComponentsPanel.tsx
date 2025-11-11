@@ -14,19 +14,19 @@ interface Component {
 }
 
 const COMPONENTS: Component[] = [
-  // Shelving
-  { id: 'shelf-standard', name: 'Standard', width: 12, depth: 4, category: 'Shelving' },
-  { id: 'shelf-endcap', name: 'End Cap', width: 3, depth: 4, category: 'Shelving' },
+  // Shelving (dimensiones en metros)
+  { id: 'shelf-standard', name: 'Standard', width: 3.6, depth: 1.2, category: 'Shelving' },
+  { id: 'shelf-endcap', name: 'End Cap', width: 0.9, depth: 1.2, category: 'Shelving' },
 
-  // Refrigeration
-  { id: 'fridge-freezer', name: 'Freezer', width: 8, depth: 4, category: 'Refrigeration' },
-  { id: 'fridge-cooler', name: 'Cooler', width: 12, depth: 4, category: 'Refrigeration' },
+  // Refrigeration (dimensiones en metros)
+  { id: 'fridge-freezer', name: 'Freezer', width: 2.4, depth: 1.2, category: 'Refrigeration' },
+  { id: 'fridge-cooler', name: 'Cooler', width: 3.6, depth: 1.2, category: 'Refrigeration' },
 
-  // Checkouts
-  { id: 'checkout-lane', name: 'Checkout Lane', width: 8, depth: 4, category: 'Checkouts' },
+  // Checkouts (dimensiones en metros)
+  { id: 'checkout-lane', name: 'Checkout Lane', width: 2.4, depth: 1.2, category: 'Checkouts' },
 
-  // Structural
-  { id: 'struct-wall', name: 'Wall Unit', width: 12, depth: 2, category: 'Structural' },
+  // Structural (dimensiones en metros)
+  { id: 'struct-wall', name: 'Wall Unit', width: 3.6, depth: 0.6, category: 'Structural' },
 ];
 
 const CATEGORIES = ['Shelving', 'Refrigeration', 'Checkouts', 'Structural'];

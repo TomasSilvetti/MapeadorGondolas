@@ -39,8 +39,8 @@ export interface Gondola {
   name: string;
   x: number;
   y: number;
-  width: number; // en pies
-  depth: number; // en pies
+  width: number; // en metros
+  depth: number; // en metros
   rotation: number; // 0-360 grados
   estantes?: Shelf[];
 }
@@ -90,6 +90,7 @@ export interface GondolasStore {
   updateGondola: (id: string, data: Partial<Gondola>) => void;
   updateShelf: (gondolaId: string, shelfId: string, data: Partial<Shelf>) => void;
   updateShelfCount: (gondolaId: string, count: number) => void;
+  applyGlobalShelfConfig: (gondolaId: string, config: Partial<Shelf>) => void;
   deleteGondola: (id: string) => void;
   selectGondola: (id: string | null) => void;
   clearGondolas: () => void;

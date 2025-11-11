@@ -73,6 +73,20 @@ export const useGondolasStore = create<GondolasStore>((set) => ({
       }),
     })),
   
+  applyGlobalShelfConfig: (gondolaId: string, config: Partial<Shelf>) =>
+    set((state) => ({
+      gondolas: state.gondolas.map((g) => {
+        if (g.id !== gondolaId) return g;
+        return {
+          ...g,
+          estantes: g.estantes?.map((s) => ({
+            ...s,
+            ...config,
+          })),
+        };
+      }),
+    })),
+  
   deleteGondola: (id: string) =>
     set((state) => ({
       gondolas: state.gondolas.filter((g) => g.id !== id),
