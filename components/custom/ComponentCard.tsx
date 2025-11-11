@@ -32,7 +32,7 @@ export const ComponentCard = ({ id, name, width, depth, category }: ComponentCar
         <div className="flex-1">
           <h4 className="text-sm font-medium text-slate-100">{name}</h4>
           <p className="text-xs text-slate-400 mt-1">
-            {width}&apos; × {depth}&apos;
+            {width}m × {depth}m
           </p>
         </div>
       </div>
