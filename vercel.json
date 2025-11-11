@@ -1,0 +1,5 @@
+{
+  "buildCommand": "cd mapeador-gondolas-app && npm run build",
+  "outputDirectory": "mapeador-gondolas-app/.next",
+  "installCommand": "cd mapeador-gondolas-app && npm install"
+}

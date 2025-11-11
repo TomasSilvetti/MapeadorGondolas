@@ -37,7 +37,7 @@ Las historias están ordenadas de menor a mayor dependencia. Las primeras son fu
 **Para** tener un código type-safe y bien estructurado
 
 **Criterios de Aceptación:**
-- [ ] Tipo `Product` definido (id, nombre, precio, margen, popularidad, categoría, stock)
+- [ ] Tipo `Product` definido (id, nombre, precio, margen, rotación promedio, categoría, stock)
 - [ ] Tipo `Gondola` definido (id, tipo, posición, rotación, largo, estantes)
 - [ ] Tipo `Shelf` definido (id, número, espacios, restricciones)
 - [ ] Tipo `Space` definido (id, posición, categorías permitidas/prohibidas)
@@ -68,7 +68,7 @@ Las historias están ordenadas de menor a mayor dependencia. Las primeras son fu
 - [ ] Acción: `getProductsByCategory(category: string)`
 - [ ] Acción: `clearProducts()`
 - [ ] Selector: productos con stock disponible
-- [ ] Selector: productos ordenados por popularidad
+- [ ] Selector: productos ordenados por rotación promedio
 - [ ] Selector: productos ordenados por margen
 
 **Dependencias:** HU-002
@@ -132,7 +132,7 @@ Las historias están ordenadas de menor a mayor dependencia. Las primeras son fu
 - [ ] Store `useSolverConfigStore` creado
 - [ ] Estado: configuración con valores por defecto
 - [ ] Parámetro: peso de margen de ganancia (0-100)
-- [ ] Parámetro: peso de popularidad (0-100)
+- [ ] Parámetro: peso de rotación promedio (0-100)
 - [ ] Parámetro: estantes óptimos (array, default [4, 5])
 - [ ] Acción: `updateConfig(config: Partial<SolverConfig>)`
 - [ ] Acción: `resetConfig()`
@@ -247,7 +247,7 @@ Las historias están ordenadas de menor a mayor dependencia. Las primeras son fu
 - [ ] Cada góndola tiene un ID único generado automáticamente
 - [ ] Góndola se agrega al store de góndolas
 - [ ] Góndola se renderiza inmediatamente en el mapa
-- [ ] Valores por defecto: 5 estantes, 10 espacios por estante, largo 3 metros
+- [ ] Valores por defecto: 5 estantes, 1 espacio por estante, largo 3 metros
 - [ ] Contador de góndolas totales visible
 
 **Dependencias:** HU-004, HU-010
@@ -396,7 +396,7 @@ Las historias están ordenadas de menor a mayor dependencia. Las primeras son fu
 **Criterios de Aceptación:**
 - [ ] Página o modal de configuración del solver
 - [ ] Slider para peso de margen de ganancia (0-100%)
-- [ ] Slider para peso de popularidad (0-100%)
+- [ ] Slider para peso de rotación promedio (0-100%)
 - [ ] Validación: suma de pesos = 100%
 - [ ] Ajuste automático del otro peso al mover uno
 - [ ] Input para estantes óptimos (default: 4, 5)
@@ -418,7 +418,7 @@ Las historias están ordenadas de menor a mayor dependencia. Las primeras son fu
 
 **Criterios de Aceptación:**
 - [ ] Función `runSolver(products, gondolas, config): Assignment[]`
-- [ ] Calcula score por producto: `score = (margen * pesoMargen) + (popularidad * pesoPop)`
+- [ ] Calcula score por producto: `score = (margen * pesoMargen) + (rotacionPromedio * pesoRotacion)`
 - [ ] Ordena productos por score descendente
 - [ ] Asigna productos de mayor score a estantes óptimos primero
 - [ ] Respeta restricciones de categoría por espacio
@@ -543,7 +543,7 @@ Las historias están ordenadas de menor a mayor dependencia. Las primeras son fu
   - [ ] Estante
   - [ ] Espacio
   - [ ] Margen
-  - [ ] Popularidad
+  - [ ] Rotación promedio
   - [ ] Score calculado
 - [ ] Ordenamiento por cualquier columna
 - [ ] Filtros por categoría, góndola, estante
@@ -614,7 +614,7 @@ Las historias están ordenadas de menor a mayor dependencia. Las primeras son fu
 - [ ] Tabla con columnas:
   - [ ] Góndola
   - [ ] Margen promedio de productos
-  - [ ] Popularidad promedio
+  - [ ] Rotación promedio
   - [ ] Score promedio
   - [ ] Cantidad de productos
 - [ ] Gráfico de barras comparando rentabilidad (Recharts)
@@ -661,7 +661,7 @@ Las historias están ordenadas de menor a mayor dependencia. Las primeras son fu
   - [ ] Total de góndolas
   - [ ] % de ocupación global
   - [ ] Margen promedio de productos asignados
-  - [ ] Popularidad promedio
+  - [ ] Rotación promedio
 - [ ] Gráfico de distribución de productos por estante (Recharts)
 - [ ] Gráfico mostrando productos en zona óptima vs otras zonas
 - [ ] Accesos rápidos a reportes detallados

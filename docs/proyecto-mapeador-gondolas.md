@@ -21,14 +21,14 @@ Software web para optimizar la disposición de productos en un supermercado medi
 
 3. **Gestión de Productos**
    - Carga mediante archivo CSV
-   - Atributos: precio, margen de ganancia, popularidad, categoría, stock
+   - Atributos: precio, margen de ganancia, rotación promedio (ventas del último mes), categoría, stock
    - ~500 productos para pruebas
 
 4. **Algoritmo Solver**
-   - Optimiza ubicación según margen de ganancia y popularidad
-   - Prioriza estantes 4 y 5 (altura de vista) para productos más rentables/populares
+   - Optimiza ubicación según margen de ganancia y rotación promedio
+   - Prioriza estantes 4 y 5 (altura de vista) para productos más rentables/alta rotación
    - Distribuye productos menos rentables hacia arriba o abajo
-   - Panel de configuración de pesos (margen vs popularidad)
+   - Panel de configuración de pesos (margen vs rotación promedio)
    - Ejecución mediante botón (puede tomar varios segundos)
    - Verifica stock antes de asignar
 
@@ -120,7 +120,7 @@ Software web para optimizar la disposición de productos en un supermercado medi
 - Nombre
 - Precio
 - Margen de ganancia
-- Popularidad/ventas
+- Rotación promedio (ventas del último mes)
 - Categoría
 - Stock (para verificación, no para optimización)
 
@@ -137,20 +137,20 @@ Software web para optimizar la disposición de productos en un supermercado medi
 ### Objetivo
 Asignar cada producto al espacio óptimo considerando:
 - Margen de ganancia (peso configurable)
-- Popularidad/ventas (peso configurable)
+- Rotación promedio (peso configurable)
 - Restricciones de categoría por espacio
 - Disponibilidad de stock
 
 ### Criterios de Optimización
 - **Estantes óptimos:** 4 y 5 (contando desde abajo) = altura de vista
-- **Productos prioritarios:** Mayor margen + mayor popularidad → estantes 4-5
-- **Productos secundarios:** Menor margen/popularidad → estantes alejados (arriba o abajo)
+- **Productos prioritarios:** Mayor margen + mayor rotación promedio → estantes 4-5
+- **Productos secundarios:** Menor margen/rotación promedio → estantes alejados (arriba o abajo)
 
 ### Configuración
 - Panel con sliders/inputs para ajustar pesos
 - Pesos configurables:
   - Peso de margen de ganancia
-  - Peso de popularidad
+  - Peso de rotación promedio
   - (Otros parámetros según necesidad)
 
 ### Ejecución
@@ -189,7 +189,7 @@ Asignar cada producto al espacio óptimo considerando:
 
 5. **Configuración del Solver**
    - Ir a panel de configuración
-   - Ajustar pesos (margen vs popularidad)
+   - Ajustar pesos (margen vs rotación promedio)
    - Ajustar otros parámetros
 
 6. **Ejecución del Solver**
@@ -344,7 +344,7 @@ Asignar cada producto al espacio óptimo considerando:
 {
   config: {
     marginWeight: number,
-    popularityWeight: number,
+    popularityWeight: number, // peso de rotación promedio
     // otros parámetros
   },
   updateConfig: (config) => void
@@ -357,7 +357,7 @@ Asignar cada producto al espacio óptimo considerando:
 
 ### Columnas Requeridas
 ```csv
-id,nombre,precio,margen_ganancia,popularidad,categoria,stock
+id,nombre,precio,margen_ganancia,rotacion_promedio,categoria,stock
 1,Coca Cola 2L,150,0.35,95,Bebidas,100
 2,Pan Lactal,85,0.25,88,Panadería,50
 3,Leche Entera 1L,120,0.30,92,Lácteos,75
@@ -368,7 +368,7 @@ id,nombre,precio,margen_ganancia,popularidad,categoria,stock
 - ID único por producto
 - Precio > 0
 - Margen entre 0 y 1 (o porcentaje)
-- Popularidad entre 0 y 100
+- Rotación promedio entre 0 y 100 (ventas del último mes)
 - Stock >= 0
 
 ---
