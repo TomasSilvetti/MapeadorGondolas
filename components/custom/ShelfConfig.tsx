@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Category, Shelf } from '@/types';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { useCategoriesStore } from '@/stores/categories';
 import { X, Search } from 'lucide-react';
 
 interface ShelfConfigProps {
@@ -13,19 +14,18 @@ interface ShelfConfigProps {
   onUpdate: (data: Partial<Shelf>) => void;
 }
 
-const CATEGORIAS_DISPONIBLES: Category[] = [
-  'Bebidas',
-  'Panadería',
-  'Lácteos',
-  'Carnes',
-  'Verduras',
-  'Frutas',
-  'Otros',
-];
-
 export const ShelfConfig = ({ shelf, onUpdate }: ShelfConfigProps) => {
+  const { loadCategories, getAllCategoryNames } = useCategoriesStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
+
+  // Cargar categorías dinámicas
+  useEffect(() => {
+    loadCategories();
+  }, [loadCategories]);
+
+  // Obtener categorías disponibles dinámicamente
+  const CATEGORIAS_DISPONIBLES = getAllCategoryNames();
 
   const categoriasFiltradas = CATEGORIAS_DISPONIBLES.filter(
     (cat) =>
@@ -53,11 +53,18 @@ export const ShelfConfig = ({ shelf, onUpdate }: ShelfConfigProps) => {
     onUpdate({ cantidadEspacios: value[0] });
   };
 
+  const handleVisualizationChange = (value: number[]) => {
+    // Convertir de porcentaje (0-100) a factor (0-1)
+    onUpdate({ factorVisualizacion: value[0] / 100 });
+  };
+
   const toggleModoRestriccion = () => {
     onUpdate({
       restriccionModo: shelf.restriccionModo === 'permitir' ? 'excluir' : 'permitir',
     });
   };
+
+  const visualizationPercent = Math.round((shelf.factorVisualizacion || 1.0) * 100);
 
   return (
     <div className="space-y-4 p-4">
@@ -79,6 +86,29 @@ export const ShelfConfig = ({ shelf, onUpdate }: ShelfConfigProps) => {
           step={1}
           className="w-full"
         />
+      </div>
+
+      {/* Slider de factor de visualización */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <label className="text-xs font-medium text-slate-300">
+            Factor de visualización
+          </label>
+          <span className="text-sm font-semibold text-slate-100 bg-blue-600 px-2 py-1 rounded">
+            {visualizationPercent}%
+          </span>
+        </div>
+        <Slider
+          value={[visualizationPercent]}
+          onValueChange={handleVisualizationChange}
+          min={25}
+          max={100}
+          step={1}
+          className="w-full"
+        />
+        <p className="text-[10px] text-slate-400 mt-1">
+          Ajusta manualmente el factor de visualización de este estante
+        </p>
       </div>
 
       {/* Restricciones de categoría */}

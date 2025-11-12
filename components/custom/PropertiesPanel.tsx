@@ -15,6 +15,7 @@ import {
 import { ShelfPreview } from './ShelfPreview';
 import { ShelfConfig } from './ShelfConfig';
 import { useGondolasStore } from '@/stores/gondolas';
+import { useCategoriesStore } from '@/stores/categories';
 import { X, Search } from 'lucide-react';
 
 interface PropertiesPanelProps {
@@ -22,18 +23,10 @@ interface PropertiesPanelProps {
   onUpdate: (id: string, data: Partial<Gondola>) => void;
 }
 
-const CATEGORIAS_DISPONIBLES: Category[] = [
-  'Bebidas',
-  'Panadería',
-  'Lácteos',
-  'Carnes',
-  'Verduras',
-  'Frutas',
-  'Otros',
-];
-
 export const PropertiesPanel = ({ gondola, onUpdate }: PropertiesPanelProps) => {
-  const { updateShelf, updateShelfCount, applyGlobalShelfConfig } = useGondolasStore();
+  const { updateShelf, updateShelfCount, applyGlobalShelfConfig, updatePrincipalShelf } = useGondolasStore();
+  const { categories, loadCategories, getAllCategoryNames } = useCategoriesStore();
+  
   const [widthInput, setWidthInput] = useState('');
   const [depthInput, setDepthInput] = useState('');
   const [rotationInput, setRotationInput] = useState('');
@@ -45,6 +38,14 @@ export const PropertiesPanel = ({ gondola, onUpdate }: PropertiesPanelProps) => 
   const [globalCategories, setGlobalCategories] = useState<Category[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
+
+  // Cargar categorías dinámicas
+  useEffect(() => {
+    loadCategories();
+  }, [loadCategories]);
+
+  // Obtener categorías disponibles dinámicamente
+  const CATEGORIAS_DISPONIBLES = getAllCategoryNames();
 
   // Sincronizar estados cuando cambia la góndola
   useEffect(() => {
@@ -129,6 +130,12 @@ export const PropertiesPanel = ({ gondola, onUpdate }: PropertiesPanelProps) => 
     }
   };
 
+  const handlePrincipalShelfChange = (index: number) => {
+    if (gondola) {
+      updatePrincipalShelf(gondola.id, index);
+    }
+  };
+
   return (
     <div className="w-[320px] bg-slate-900 border-l border-slate-700 flex flex-col h-full">
       {/* Header */}
@@ -152,7 +159,11 @@ export const PropertiesPanel = ({ gondola, onUpdate }: PropertiesPanelProps) => 
               <label className="text-xs font-medium text-slate-300 block mb-2">
                 Previsualización de Estantes
               </label>
-              <ShelfPreview shelves={gondola.estantes || []} />
+              <ShelfPreview 
+                shelves={gondola.estantes || []} 
+                estantePrincipalIndex={gondola.estantePrincipalIndex ?? Math.floor((gondola.estantes?.length || 0) / 2)}
+                onPrincipalShelfChange={handlePrincipalShelfChange}
+              />
             </div>
 
             {/* Accordion de Dimensiones */}

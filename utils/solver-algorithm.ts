@@ -8,6 +8,7 @@ interface Position {
   spaceId: string;
   shelfNumber: number;
   totalShelves: number;
+  factorVisualizacion: number;
 }
 
 interface CategoryConstraint {
@@ -15,26 +16,6 @@ interface CategoryConstraint {
   categorias: Category[];
 }
 
-/**
- * Calcula el factor de visibilidad basado en la posición del estante
- * Estantes 4-5 son óptimos (altura de vista)
- */
-export const calculateVisibilityFactor = (
-  shelfNumber: number,
-  totalShelves: number
-): number => {
-  // Estantes óptimos (4-5 desde abajo)
-  if (shelfNumber === 4 || shelfNumber === 5) return 1.0;
-  
-  // Estantes buenos (3, 6)
-  if (shelfNumber === 3 || shelfNumber === 6) return 0.75;
-  
-  // Estantes regulares (2, 7)
-  if (shelfNumber === 2 || shelfNumber === 7) return 0.50;
-  
-  // Estantes malos (1, 8+)
-  return 0.25;
-};
 
 /**
  * Extrae todas las posiciones disponibles de las góndolas
@@ -59,6 +40,7 @@ const extractAllPositions = (gondolas: Gondola[]): Position[] => {
           spaceId: `space-${shelf.id}-${i}`,
           shelfNumber: shelf.numero,
           totalShelves,
+          factorVisualizacion: shelf.factorVisualizacion || 1.0,
         });
       }
     }
@@ -89,15 +71,14 @@ const extractCategoryConstraints = (gondolas: Gondola[]): Record<string, Categor
 
 /**
  * Calcula factores de visibilidad para todas las posiciones
+ * Usa el factor de visualización configurado en cada estante
  */
 const calculateVisibilityFactors = (positions: Position[]): Record<string, number> => {
   const factors: Record<string, number> = {};
   
   for (const position of positions) {
-    factors[position.id] = calculateVisibilityFactor(
-      position.shelfNumber,
-      position.totalShelves
-    );
+    // Usar el factor configurado en el estante en lugar de calcularlo
+    factors[position.id] = position.factorVisualizacion;
   }
   
   return factors;
@@ -285,13 +266,12 @@ export const calculateProductScore = (
 };
 
 /**
- * Calcula el score de una posición
+ * Calcula el score de una posición basado en su factor de visualización
  */
 export const calculatePositionScore = (
-  shelfNumber: number,
-  totalShelves: number
+  factorVisualizacion: number
 ): number => {
-  return calculateVisibilityFactor(shelfNumber, totalShelves);
+  return factorVisualizacion;
 };
 
 /**

@@ -1,5 +1,17 @@
 // Product types
-export type Category = 'Bebidas' | 'Panadería' | 'Lácteos' | 'Carnes' | 'Verduras' | 'Frutas' | 'Otros';
+export type Category = string; // Ahora las categorías son dinámicas
+
+export interface CategoryDefinition {
+  id: string;
+  nombre: string;
+  subcategorias: string[]; // IDs de subcategorías
+}
+
+export interface SubcategoryDefinition {
+  id: string;
+  nombre: string;
+  categoriaId: string; // ID de la categoría padre
+}
 
 export interface Product {
   id: string;
@@ -8,6 +20,7 @@ export interface Product {
   margen_ganancia: number;
   ventas: number; // número de unidades vendidas (ventas del último mes)
   categoria: Category;
+  subcategoria?: string; // Subcategoría opcional
   stock: number;
   facingsDeseados?: number; // cantidad de espacios que puede ocupar
 }
@@ -43,6 +56,7 @@ export interface Gondola {
   depth: number; // en metros
   rotation: number; // 0-360 grados
   estantes?: Shelf[];
+  estantePrincipalIndex?: number; // índice del estante con 100% visualización
 }
 
 // Assignment types
@@ -91,6 +105,7 @@ export interface GondolasStore {
   updateShelf: (gondolaId: string, shelfId: string, data: Partial<Shelf>) => void;
   updateShelfCount: (gondolaId: string, count: number) => void;
   applyGlobalShelfConfig: (gondolaId: string, config: Partial<Shelf>) => void;
+  updatePrincipalShelf: (gondolaId: string, shelfIndex: number) => void;
   deleteGondola: (id: string) => void;
   selectGondola: (id: string | null) => void;
   clearGondolas: () => void;
@@ -146,4 +161,23 @@ export interface ProjectsStore {
   exportProject: (id: string) => void;
   importProject: (project: Project, replaceIfExists: boolean) => void;
   checkProjectExists: (id: string) => boolean;
+}
+
+// Categories Store types
+export interface CategoriesStore {
+  categories: CategoryDefinition[];
+  subcategories: SubcategoryDefinition[];
+  loadCategories: () => void;
+  addCategory: (nombre: string) => CategoryDefinition;
+  updateCategory: (id: string, nombre: string) => void;
+  deleteCategory: (id: string) => void;
+  addSubcategory: (nombre: string, categoriaId: string) => SubcategoryDefinition;
+  updateSubcategory: (id: string, nombre: string) => void;
+  deleteSubcategory: (id: string) => void;
+  getCategoryById: (id: string) => CategoryDefinition | undefined;
+  getSubcategoryById: (id: string) => SubcategoryDefinition | undefined;
+  getSubcategoriesByCategory: (categoriaId: string) => SubcategoryDefinition[];
+  getAllCategoryNames: () => string[];
+  isCategoryInUse: (categoryName: string, products: Product[], gondolas: Gondola[]) => boolean;
+  isSubcategoryInUse: (subcategoryName: string, products: Product[]) => boolean;
 }
