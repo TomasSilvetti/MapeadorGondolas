@@ -8,7 +8,7 @@ import { ProjectCard } from '@/components/custom/ProjectCard';
 import { CreateProjectModal } from '@/components/custom/CreateProjectModal';
 import { ImportDialog } from '@/components/custom/ImportDialog';
 import { WelcomeGuide } from '@/components/custom/WelcomeGuide';
-import { Plus, FolderOpen, Upload, FileUp, Tags } from 'lucide-react';
+import { Plus, FolderOpen, Upload, FileUp, Tags, Package } from 'lucide-react';
 import { readProjectFile } from '@/utils/project-io';
 import { Project } from '@/types';
 
@@ -109,14 +109,24 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold text-slate-100">Mapeador de Góndolas</h1>
-            <Button
-              onClick={() => router.push('/categories')}
-              variant="outline"
-              className="border-slate-600 text-slate-300 hover:bg-slate-800"
-            >
-              <Tags className="w-4 h-4 mr-2" />
-              Gestionar Categorías
-            </Button>
+            <div className="flex gap-3">
+              <Button
+                onClick={() => router.push('/categories')}
+                variant="outline"
+                className="border-slate-600 text-slate-300 hover:bg-slate-800"
+              >
+                <Tags className="w-4 h-4 mr-2" />
+                Gestionar Categorías
+              </Button>
+              <Button
+                onClick={() => router.push('/products')}
+                variant="outline"
+                className="border-slate-600 text-slate-300 hover:bg-slate-800"
+              >
+                <Package className="w-4 h-4 mr-2" />
+                Gestionar Productos
+              </Button>
+            </div>
           </div>
         </div>
       </nav>

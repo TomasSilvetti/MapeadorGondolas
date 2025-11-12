@@ -231,7 +231,9 @@ export const useCategoriesStore = create<CategoriesStore>((set, get) => ({
   isCategoryInUse: (categoryName: string, products: Product[], gondolas: Gondola[]) => {
     // Verificar si algún producto usa esta categoría
     const usedInProducts = products.some(
-      (product) => product.categoria === categoryName
+      (product) => Array.isArray(product.categoria) 
+        ? product.categoria.includes(categoryName)
+        : product.categoria === categoryName
     );
     
     if (usedInProducts) return true;
@@ -247,7 +249,11 @@ export const useCategoriesStore = create<CategoriesStore>((set, get) => ({
   },
 
   isSubcategoryInUse: (subcategoryName: string, products: Product[]) => {
-    return products.some((product) => product.subcategoria === subcategoryName);
+    return products.some((product) => 
+      Array.isArray(product.subcategoria) 
+        ? product.subcategoria.includes(subcategoryName)
+        : product.subcategoria === subcategoryName
+    );
   },
 }));
 

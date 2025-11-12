@@ -19,8 +19,8 @@ export interface Product {
   precio: number;
   margen_ganancia: number;
   ventas: number; // número de unidades vendidas (ventas del último mes)
-  categoria: Category;
-  subcategoria?: string; // Subcategoría opcional
+  categoria: string[]; // array de nombres de categorías
+  subcategoria?: string[]; // array de nombres de subcategorías opcionales
   stock: number;
   facingsDeseados?: number; // cantidad de espacios que puede ocupar
 }
@@ -93,7 +93,11 @@ export interface SolverResult {
 export interface ProductsStore {
   products: Product[];
   loadProducts: (products: Product[]) => void;
+  addProduct: (product: Product) => void;
   updateProduct: (id: string, data: Partial<Product>) => void;
+  deleteProduct: (id: string) => void;
+  getProductById: (id: string) => Product | undefined;
+  isProductInUse: (productId: string, assignments: Assignment[]) => boolean;
   clearProducts: () => void;
 }
 

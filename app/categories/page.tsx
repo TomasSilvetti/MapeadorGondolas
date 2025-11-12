@@ -302,11 +302,11 @@ export default function CategoriesPage() {
   };
 
   const getProductCountByCategory = (categoryName: string) => {
-    return products.filter((p) => p.categoria === categoryName).length;
+    return products.filter((p) => p.categoria && p.categoria.includes(categoryName)).length;
   };
 
   const getProductCountBySubcategory = (subcategoryName: string) => {
-    return products.filter((p) => p.subcategoria === subcategoryName).length;
+    return products.filter((p) => p.subcategoria && p.subcategoria.includes(subcategoryName)).length;
   };
 
   return (

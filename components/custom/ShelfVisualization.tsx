@@ -47,7 +47,11 @@ export const ShelfVisualization = ({
         if (product) {
           // Extraer el número de posición del spaceId
           const spacePosition = parseInt(assignment.spaceId.split('-').pop() || '0');
-          const color = categoryColors[product.categoria] || categoryColors['Otros'];
+          // Usar la primera categoría si es un array
+          const categoryName = Array.isArray(product.categoria) 
+            ? product.categoria[0] 
+            : product.categoria;
+          const color = categoryColors[categoryName] || categoryColors['Otros'];
           
           // Marcar los espacios ocupados por este producto (facings)
           for (let i = 0; i < assignment.cantidad; i++) {
