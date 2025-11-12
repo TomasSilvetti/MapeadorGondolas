@@ -15,6 +15,7 @@ import {
 import { ShelfPreview } from './ShelfPreview';
 import { ShelfConfig } from './ShelfConfig';
 import { useGondolasStore } from '@/stores/gondolas';
+import { useCategoriesStore } from '@/stores/categories';
 import { X, Search } from 'lucide-react';
 
 interface PropertiesPanelProps {
@@ -22,18 +23,10 @@ interface PropertiesPanelProps {
   onUpdate: (id: string, data: Partial<Gondola>) => void;
 }
 
-const CATEGORIAS_DISPONIBLES: Category[] = [
-  'Bebidas',
-  'Panadería',
-  'Lácteos',
-  'Carnes',
-  'Verduras',
-  'Frutas',
-  'Otros',
-];
-
 export const PropertiesPanel = ({ gondola, onUpdate }: PropertiesPanelProps) => {
   const { updateShelf, updateShelfCount, applyGlobalShelfConfig, updatePrincipalShelf } = useGondolasStore();
+  const { categories, loadCategories, getAllCategoryNames } = useCategoriesStore();
+  
   const [widthInput, setWidthInput] = useState('');
   const [depthInput, setDepthInput] = useState('');
   const [rotationInput, setRotationInput] = useState('');
@@ -45,6 +38,14 @@ export const PropertiesPanel = ({ gondola, onUpdate }: PropertiesPanelProps) => 
   const [globalCategories, setGlobalCategories] = useState<Category[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
+
+  // Cargar categorías dinámicas
+  useEffect(() => {
+    loadCategories();
+  }, [loadCategories]);
+
+  // Obtener categorías disponibles dinámicamente
+  const CATEGORIAS_DISPONIBLES = getAllCategoryNames();
 
   // Sincronizar estados cuando cambia la góndola
   useEffect(() => {

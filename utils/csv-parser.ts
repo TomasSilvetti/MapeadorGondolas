@@ -12,6 +12,7 @@ export interface CSVRow {
   popularidad?: string; // DEPRECATED: usar 'ventas' (mantenido para compatibilidad)
   rotacion_promedio?: string; // DEPRECATED: alternativa antigua
   categoria?: string;
+  subcategoria?: string; // Nueva columna para subcategorías
   stock?: string;
 }
 
@@ -52,6 +53,7 @@ export const parseCSV = (file: File | Blob): Promise<Product[]> => {
                     margen_ganancia: margen,
                     ventas,
                     categoria: (row.categoria as Category) || 'Otros',
+                    subcategoria: row.subcategoria?.trim() || undefined,
                     stock,
                   };
                 });

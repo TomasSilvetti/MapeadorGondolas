@@ -1,17 +1,19 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useProjectsStore } from '@/stores/projects';
 import { ProjectCard } from '@/components/custom/ProjectCard';
 import { CreateProjectModal } from '@/components/custom/CreateProjectModal';
 import { ImportDialog } from '@/components/custom/ImportDialog';
 import { WelcomeGuide } from '@/components/custom/WelcomeGuide';
-import { Plus, FolderOpen, Upload, FileUp } from 'lucide-react';
+import { Plus, FolderOpen, Upload, FileUp, Tags } from 'lucide-react';
 import { readProjectFile } from '@/utils/project-io';
 import { Project } from '@/types';
 
 export default function Home() {
+  const router = useRouter();
   const projects = useProjectsStore((state) => state.projects);
   const loadProjects = useProjectsStore((state) => state.loadProjects);
   const importProject = useProjectsStore((state) => state.importProject);
@@ -107,6 +109,14 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold text-slate-100">Mapeador de Góndolas</h1>
+            <Button
+              onClick={() => router.push('/categories')}
+              variant="outline"
+              className="border-slate-600 text-slate-300 hover:bg-slate-800"
+            >
+              <Tags className="w-4 h-4 mr-2" />
+              Gestionar Categorías
+            </Button>
           </div>
         </div>
       </nav>

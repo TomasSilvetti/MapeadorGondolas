@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { ArrowLeft, Eye, Edit3, BarChart3, Home, Download } from 'lucide-react';
+import { ArrowLeft, Eye, Edit3, BarChart3, Home, Download, Tags } from 'lucide-react';
 
 interface TopBarProps {
   onRunSolver?: () => void;
@@ -43,6 +43,15 @@ export const TopBar = ({
         >
           <Home className="w-4 h-4 mr-2" />
           Inicio
+        </Button>
+        <Button
+          onClick={() => router.push('/categories')}
+          variant="ghost"
+          size="sm"
+          className="text-slate-400 hover:text-slate-100 hover:bg-slate-800"
+        >
+          <Tags className="w-4 h-4 mr-2" />
+          Categorías
         </Button>
         <div className="w-px h-6 bg-slate-700" />
         <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">

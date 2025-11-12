@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Category, Shelf } from '@/types';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { useCategoriesStore } from '@/stores/categories';
 import { X, Search } from 'lucide-react';
 
 interface ShelfConfigProps {
@@ -13,19 +14,18 @@ interface ShelfConfigProps {
   onUpdate: (data: Partial<Shelf>) => void;
 }
 
-const CATEGORIAS_DISPONIBLES: Category[] = [
-  'Bebidas',
-  'Panadería',
-  'Lácteos',
-  'Carnes',
-  'Verduras',
-  'Frutas',
-  'Otros',
-];
-
 export const ShelfConfig = ({ shelf, onUpdate }: ShelfConfigProps) => {
+  const { loadCategories, getAllCategoryNames } = useCategoriesStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
+
+  // Cargar categorías dinámicas
+  useEffect(() => {
+    loadCategories();
+  }, [loadCategories]);
+
+  // Obtener categorías disponibles dinámicamente
+  const CATEGORIAS_DISPONIBLES = getAllCategoryNames();
 
   const categoriasFiltradas = CATEGORIAS_DISPONIBLES.filter(
     (cat) =>
