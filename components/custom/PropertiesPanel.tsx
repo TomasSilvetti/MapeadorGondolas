@@ -33,7 +33,7 @@ const CATEGORIAS_DISPONIBLES: Category[] = [
 ];
 
 export const PropertiesPanel = ({ gondola, onUpdate }: PropertiesPanelProps) => {
-  const { updateShelf, updateShelfCount, applyGlobalShelfConfig } = useGondolasStore();
+  const { updateShelf, updateShelfCount, applyGlobalShelfConfig, updatePrincipalShelf } = useGondolasStore();
   const [widthInput, setWidthInput] = useState('');
   const [depthInput, setDepthInput] = useState('');
   const [rotationInput, setRotationInput] = useState('');
@@ -129,6 +129,12 @@ export const PropertiesPanel = ({ gondola, onUpdate }: PropertiesPanelProps) => 
     }
   };
 
+  const handlePrincipalShelfChange = (index: number) => {
+    if (gondola) {
+      updatePrincipalShelf(gondola.id, index);
+    }
+  };
+
   return (
     <div className="w-[320px] bg-slate-900 border-l border-slate-700 flex flex-col h-full">
       {/* Header */}
@@ -152,7 +158,11 @@ export const PropertiesPanel = ({ gondola, onUpdate }: PropertiesPanelProps) => 
               <label className="text-xs font-medium text-slate-300 block mb-2">
                 Previsualización de Estantes
               </label>
-              <ShelfPreview shelves={gondola.estantes || []} />
+              <ShelfPreview 
+                shelves={gondola.estantes || []} 
+                estantePrincipalIndex={gondola.estantePrincipalIndex ?? Math.floor((gondola.estantes?.length || 0) / 2)}
+                onPrincipalShelfChange={handlePrincipalShelfChange}
+              />
             </div>
 
             {/* Accordion de Dimensiones */}

@@ -43,6 +43,7 @@ export interface Gondola {
   depth: number; // en metros
   rotation: number; // 0-360 grados
   estantes?: Shelf[];
+  estantePrincipalIndex?: number; // índice del estante con 100% visualización
 }
 
 // Assignment types
@@ -91,6 +92,7 @@ export interface GondolasStore {
   updateShelf: (gondolaId: string, shelfId: string, data: Partial<Shelf>) => void;
   updateShelfCount: (gondolaId: string, count: number) => void;
   applyGlobalShelfConfig: (gondolaId: string, config: Partial<Shelf>) => void;
+  updatePrincipalShelf: (gondolaId: string, shelfIndex: number) => void;
   deleteGondola: (id: string) => void;
   selectGondola: (id: string | null) => void;
   clearGondolas: () => void;
