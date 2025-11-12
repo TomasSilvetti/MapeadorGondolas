@@ -52,8 +52,8 @@ export const parseCSV = (file: File | Blob): Promise<Product[]> => {
                     precio,
                     margen_ganancia: margen,
                     ventas,
-                    categoria: (row.categoria as Category) || 'Otros',
-                    subcategoria: row.subcategoria?.trim() || undefined,
+                    categoria: row.categoria ? [row.categoria.trim()] : ['Otros'],
+                    subcategoria: row.subcategoria?.trim() ? [row.subcategoria.trim()] : undefined,
                     stock,
                   };
                 });
