@@ -1,9 +1,9 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import { Product, ProductsStore, Assignment } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 
-export const useProductsStore = create<ProductsStore>(
+export const useProductsStore = create<ProductsStore>()(
   persist(
     (set, get) => ({
       products: [],
