@@ -300,13 +300,22 @@ export const validateAssignment = (
   // Verificar restricciones de categoría del estante
   if (shelf.restriccionModo === 'permitir') {
     // Solo permitir categorías en la lista
-    if (shelf.categoriasRestringidas.length > 0 && 
-        !shelf.categoriasRestringidas.includes(product.categoria)) {
-      return false;
+    if (shelf.categoriasRestringidas.length > 0) {
+      // Verificar si alguna categoría del producto está en las permitidas
+      const tieneCategoriasPermitidas = product.categoria.some(cat => 
+        shelf.categoriasRestringidas.includes(cat)
+      );
+      if (!tieneCategoriasPermitidas) {
+        return false;
+      }
     }
   } else {
     // Excluir categorías en la lista
-    if (shelf.categoriasRestringidas.includes(product.categoria)) {
+    // Verificar si alguna categoría del producto está en las excluidas
+    const tieneCategoriaExcluida = product.categoria.some(cat =>
+      shelf.categoriasRestringidas.includes(cat)
+    );
+    if (tieneCategoriaExcluida) {
       return false;
     }
   }
